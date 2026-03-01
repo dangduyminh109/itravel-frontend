@@ -1,1 +1,117 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-roboto-slab), serif;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+@layer base {
+  :root {
+    --background: #ebf4f6;
+    --foreground: #031c24;
+
+    --primary: #09637e;
+    --primary-foreground: #f8fdff;
+
+    --secondary: #088395;
+    --secondary-foreground: #f8fdff;
+
+    --accent: #7ab2b2;
+    --accent-foreground: #031c24;
+
+    --muted: #d1e5e9;
+    --muted-foreground: #4a6d75;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #c1d9de;
+    --input: #c1d9de;
+    --ring: #09637e;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: #000d0f;
+    --foreground: #d9f2ef;
+
+    --primary: #005461;
+    --primary-foreground: #e0f7f4;
+
+    --secondary: #0c7779;
+    --secondary-foreground: #e0f7f4;
+
+    --accent: #249e94;
+    --accent-foreground: #000d0f;
+
+    --muted: #0a2629;
+    --muted-foreground: #7da8a2;
+
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fee2e2;
+
+    --border: #133d3d;
+    --input: #133d3d;
+    --ring: #3bc1a8;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border transition-colors duration-300;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+}
