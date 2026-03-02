@@ -11,14 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PasswordInput from "./PasswordInput";
 import { loginSchema } from "../schemas/login.schema";
-import { z } from "zod";
+import { set, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import LoginPopup from "./LoginPopup";
 import { LoginAction } from "../actions/auth.action";
 import { useRouter } from "next/navigation";
+import { useLoadingStore } from "@/store/loading.store";
 type LoginSchema = z.infer<typeof loginSchema>;
+import { useTranslations } from "next-intl";
 
 const Login = ({
   handleChangeFrom,
@@ -33,12 +35,16 @@ const Login = ({
     resolver: zodResolver(loginSchema),
   });
   const router = useRouter();
+  const { setLoading } = useLoadingStore();
+  const t = useTranslations();
 
   const onSubmit = async (data: LoginSchema) => {
+    setLoading(true);
     const result = await LoginAction({
       identifier: data.email,
       password: data.password,
     });
+    setLoading(false);
 
     if (result.success) {
       toast.success("Đăng nhập thành công!");
@@ -59,7 +65,7 @@ const Login = ({
           <Card className="w-full border-none shadow-none">
             <CardHeader className="px-3 py-1">
               <CardTitle className="text-center font-bold text-2xl">
-                ĐĂNG NHẬP
+                {t("login")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3">

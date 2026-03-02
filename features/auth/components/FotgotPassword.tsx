@@ -12,11 +12,12 @@ import { Label } from "@/components/ui/label";
 import PasswordInput from "./PasswordInput";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { set, z } from "zod";
 import { forgotPasswordSchema } from "../schemas/forgor-password.schema";
 import useOtpCooldown from "@/hooks/useOtpCooldown";
 import { toast } from "sonner";
 import { ForgotPasswordAction, sendOtpAction } from "../actions/auth.action";
+import { useLoadingStore } from "@/store/loading.store";
 
 type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 
@@ -34,19 +35,21 @@ const ForgotPassword = ({
   } = useForm<ForgotPasswordSchema>({
     resolver: zodResolver(forgotPasswordSchema),
   });
-  const { start, otpCooldown } = useOtpCooldown("otp_send_time");
-
+  const { start, clear, otpCooldown } = useOtpCooldown("otp_send_time");
+  const { setLoading } = useLoadingStore();
   const onSubmit = async (data: ForgotPasswordSchema) => {
+    setLoading(true);
     const result = await ForgotPasswordAction({
       email: data.email,
       otp: data.otp,
       newPassword: data.newPassword,
       confirmPassword: data.confirmPassword,
     });
-
+    setLoading(false);
     if (result.success) {
       toast.success("Đổi mật khẩu thành công!");
       handleChangeFrom("login");
+      clear();
     } else {
       toast.error(result.message || "Đổi mật khẩu thất bại.");
     }
@@ -57,8 +60,9 @@ const ForgotPassword = ({
     if (!isValid) return;
 
     const email = getValues("email");
-
+    setLoading(true);
     const result = await sendOtpAction(email);
+    setLoading(false);
     if (result.success) {
       toast.success(result.message || "Mã xác nhận đã được gửi.");
       start();

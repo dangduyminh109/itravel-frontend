@@ -26,5 +26,10 @@ export default function useOtpCooldown(key: string, time: number = 180) {
     setOtpCooldown(time);
   };
 
-  return { otpCooldown, start };
+    const clear = () => {
+      localStorage.removeItem(key);
+      setOtpCooldown(0);
+    };
+
+  return { otpCooldown, start, clear };
 }

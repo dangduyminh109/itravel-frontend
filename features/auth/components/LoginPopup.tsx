@@ -43,7 +43,7 @@ export default function LoginPopup() {
   return (
     <Button
       variant="outline"
-      className="w-full border-primary"
+      className="w-full border-primary cursor-pointer"
       size={"lg"}
       type="button"
       onClick={handleGoogleLogin}

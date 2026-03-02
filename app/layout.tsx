@@ -4,6 +4,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import "@/lib/fontawesome";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import GlobalLoading from "@/components/GlobalLoading";
 
 const robotoSlab = Nunito({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
             className: "!border-none",
           }}
         />
+        <GlobalLoading />
         <ThemeToggle />
       </body>
     </html>

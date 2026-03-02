@@ -17,6 +17,7 @@ import { registerSchema } from "../schemas/register.schema";
 import { toast } from "sonner";
 import { registerAction, sendOtpAction } from "../actions/auth.action";
 import useOtpCooldown from "@/hooks/useOtpCooldown";
+import { useLoadingStore } from "@/store/loading.store";
 
 type RegisterSchema = z.infer<typeof registerSchema>;
 
@@ -34,17 +35,21 @@ const Register = ({
   } = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
   });
-  const { start, otpCooldown } = useOtpCooldown("otp_send_time");
+  const { start, clear, otpCooldown } = useOtpCooldown("otp_send_time");
+  const { setLoading } = useLoadingStore();
 
   const onSubmit = async (data: RegisterSchema) => {
+    setLoading(true);
     const result = await registerAction({
       fullName: data.fullName,
       email: data.email,
       password: data.password,
       otp: data.otp,
     });
+    setLoading(false);
     if (result.success) {
       toast.success("Đăng ký thành công!");
+      clear();
       handleChangeFrom("login");
     } else {
       toast.error(result.message || "Đăng ký thất bại.");
@@ -57,7 +62,10 @@ const Register = ({
 
     const email = getValues("email");
 
+    setLoading(true);
     const result = await sendOtpAction(email);
+    setLoading(false);
+
     if (result.success) {
       toast.success(result.message || "Mã xác nhận đã được gửi.");
       start();
