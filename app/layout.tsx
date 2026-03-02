@@ -1,8 +1,10 @@
-import ThemeToggle from "@/components/ThemeToggle";
-import "./globals.css";
 import { Nunito } from "next/font/google";
+
+import ThemeToggle from "@/components/ThemeToggle";
 import "@/lib/fontawesome";
 import { Toaster } from "@/components/ui/sonner";
+import "./globals.css";
+
 const robotoSlab = Nunito({
   subsets: ["latin"],
   variable: "--font-roboto-slab",
@@ -35,11 +37,12 @@ export default function RootLayout({
           position="top-center"
           toastOptions={{
             classNames: {
-              success: "!bg-green-800 border-none",
-              error: "!bg-red-600 border-none",
-              warning: "!bg-yellow-800 border-none",
+              success: "!bg-[#10B981] !text-white",
+              error: "!bg-[#EF4444] !text-white",
+              warning: "!bg-[#F59E0B] !text-white",
+              info: "!bg-[#3B82F6] !text-white",
             },
-            className: "border-none shadow-lg",
+            className: "!border-none",
           }}
         />
         <ThemeToggle />

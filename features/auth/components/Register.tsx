@@ -9,13 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import PasswordInput from "./PasswordInput";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../schemas/register.schema";
+import { toast } from "sonner";
+import { registerAction, sendOtpAction } from "../actions/auth.action";
+import useOtpCooldown from "@/hooks/useOtpCooldown";
 
 type RegisterSchema = z.infer<typeof registerSchema>;
 
@@ -27,14 +28,43 @@ const Register = ({
   const {
     register,
     handleSubmit,
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
   });
+  const { start, otpCooldown } = useOtpCooldown("otp_send_time");
 
-  const onSubmit = (data: RegisterSchema) => {
-    console.log(data);
+  const onSubmit = async (data: RegisterSchema) => {
+    const result = await registerAction({
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password,
+      otp: data.otp,
+    });
+    if (result.success) {
+      toast.success("Đăng ký thành công!");
+      handleChangeFrom("login");
+    } else {
+      toast.error(result.message || "Đăng ký thất bại.");
+    }
   };
+
+  async function handleSendOtp() {
+    const isValid = await trigger("email");
+    if (!isValid) return;
+
+    const email = getValues("email");
+
+    const result = await sendOtpAction(email);
+    if (result.success) {
+      toast.success(result.message || "Mã xác nhận đã được gửi.");
+      start();
+    } else {
+      toast.error(result.message || "Gửi mã OTP thất bại. Vui lòng thử lại.");
+    }
+  }
 
   return (
     <>
@@ -51,6 +81,20 @@ const Register = ({
             </CardHeader>
             <CardContent className="p-3">
               <div className="flex flex-col gap-3">
+                <div className="grid gap-1">
+                  <Label htmlFor="fullName">Họ tên</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Họ và tên đầy đủ"
+                    {...register("fullName")}
+                  />
+                  {errors.fullName?.message && (
+                    <p className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.fullName.message}
+                    </p>
+                  )}
+                </div>
                 <div className="grid gap-1">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -84,21 +128,33 @@ const Register = ({
                 <div>
                   <div className="flex gap-2 items-end">
                     <div className="grid gap-1 flex-1">
-                      <Label htmlFor="code">Mã xác nhận</Label>
+                      <Label htmlFor="otp">Mã xác nhận</Label>
                       <Input
-                        id="code"
+                        id="otp"
                         type="text"
                         placeholder="Nhập mã xác nhận"
-                        {...register("code")}
+                        {...register("otp")}
                       />
                     </div>
-                    <Button type="button" className="w-22 cursor-pointer">
-                      gửi mã
+                    <Button
+                      onClick={handleSendOtp}
+                      disabled={otpCooldown > 0}
+                      type="button"
+                      className="w-22 cursor-pointer"
+                    >
+                      {otpCooldown > 0
+                        ? `${Math.floor(otpCooldown / 60)
+                            .toString()
+                            .padStart(
+                              2,
+                              "0",
+                            )}:${(otpCooldown % 60).toString().padStart(2, "0")}`
+                        : "Gửi mã"}
                     </Button>
                   </div>
-                  {errors.code?.message && (
+                  {errors.otp?.message && (
                     <p className="text-red-500 text-xs ml-1 mt-1">
-                      {errors.code?.message}
+                      {errors.otp?.message}
                     </p>
                   )}
                 </div>
@@ -111,14 +167,6 @@ const Register = ({
                 size={"lg"}
               >
                 Đăng Ký
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full border-primary cursor-pointer"
-                size={"lg"}
-              >
-                <FontAwesomeIcon icon={faGoogle} className="w-5 h-" />
-                Đăng nhập với Google
               </Button>
               <div className="text-xs">
                 Bạn đã có tài khoản?{" "}

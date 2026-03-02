@@ -1,3 +1,4 @@
+"use server";
 import { cookies } from "next/headers";
 
 export async function getAuthCookies() {
@@ -8,14 +9,17 @@ export async function getAuthCookies() {
   };
 }
 
-export async function setAuthCookies(accessToken: string, refreshToken: string) {
+export async function setAuthCookies(
+  accessToken: string,
+  refreshToken: string,
+) {
   const cookieStore = await cookies();
   cookieStore.set({
     name: "accessToken",
     value: accessToken,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 180,
+    maxAge: parseInt(process.env.NEXT_PUBLIC_ACCESS_TOKEN_DURATION || "900"),
   });
 
   cookieStore.set({
@@ -23,6 +27,12 @@ export async function setAuthCookies(accessToken: string, refreshToken: string) 
     value: refreshToken,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: parseInt(process.env.NEXT_PUBLIC_REFRESHABLE_DURATION || "604800"),
   });
+}
+
+export async function clearAuthCookies() {
+  const cookieStore = await cookies();
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
 }

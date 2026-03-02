@@ -9,17 +9,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import PasswordInput from "./PasswordInput";
 import { loginSchema } from "../schemas/login.schema";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect } from "next/navigation";
 import { toast } from "sonner";
-import error from "next/error";
 import LoginPopup from "./LoginPopup";
+import { LoginAction } from "../actions/auth.action";
+import { useRouter } from "next/navigation";
 type LoginSchema = z.infer<typeof loginSchema>;
 
 const Login = ({
@@ -34,27 +32,21 @@ const Login = ({
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
+  const router = useRouter();
 
-  const onSubmit = (data: LoginSchema) => {
-    fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          toast.success("Đăng nhập thành công!");
-          redirect("/");
-        } else {
-          toast.error(data.message || "Đăng nhập thất bại!");
-        }
-      })
-      .catch((error) => {
-        toast.error("Có lỗi xảy ra khi đăng nhập!");
-      });
+  const onSubmit = async (data: LoginSchema) => {
+    const result = await LoginAction({
+      identifier: data.email,
+      password: data.password,
+    });
+
+    if (result.success) {
+      toast.success("Đăng nhập thành công!");
+      handleChangeFrom("login");
+      router.push("/vi");
+    } else {
+      toast.error(result.message || "Đăng nhập thất bại.");
+    }
   };
 
   return (
@@ -90,6 +82,7 @@ const Login = ({
                   <div className="flex items-center">
                     <Label htmlFor="password">Mật khẩu</Label>
                     <Button
+                      tabIndex={-1}
                       variant={"link"}
                       type="button"
                       className="ml-auto inline-block cursor-pointer text-sm underline-offset-4 hover:underline h-auto p-0"

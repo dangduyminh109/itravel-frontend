@@ -11,6 +11,7 @@ import ApiResponse from "@/types/ApiResponse.type";
 import { useAuthStore } from "@/store/auth.store";
 import { GoogleLoginResponse } from "../types/googleLogin.response";
 import { CurrentAccount } from "../types/currentAccount.type";
+import { googleLogin } from "../services/auth.service";
 
 export default function LoginPopup() {
   const router = useRouter();
@@ -20,12 +21,8 @@ export default function LoginPopup() {
       const result = await signInWithPopup(auth, googleProvider);
 
       const idToken = await result.user.getIdToken();
-      const response = await fetch("/api/auth/google-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: idToken }),
-      });
-      const data = (await response.json()) as ApiResponse<GoogleLoginResponse>;
+      const response = await googleLogin(idToken);
+      const data = response as ApiResponse<GoogleLoginResponse>;
 
       if (data.success) {
         const account: CurrentAccount = {

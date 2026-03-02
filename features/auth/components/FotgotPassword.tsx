@@ -14,6 +14,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { forgotPasswordSchema } from "../schemas/forgor-password.schema";
+import useOtpCooldown from "@/hooks/useOtpCooldown";
+import { toast } from "sonner";
+import { ForgotPasswordAction, sendOtpAction } from "../actions/auth.action";
 
 type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 
@@ -25,14 +28,44 @@ const ForgotPassword = ({
   const {
     register,
     handleSubmit,
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm<ForgotPasswordSchema>({
     resolver: zodResolver(forgotPasswordSchema),
   });
+  const { start, otpCooldown } = useOtpCooldown("otp_send_time");
 
-  const onSubmit = (data: ForgotPasswordSchema) => {
-    console.log(data);
+  const onSubmit = async (data: ForgotPasswordSchema) => {
+    const result = await ForgotPasswordAction({
+      email: data.email,
+      otp: data.otp,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword,
+    });
+
+    if (result.success) {
+      toast.success("Đổi mật khẩu thành công!");
+      handleChangeFrom("login");
+    } else {
+      toast.error(result.message || "Đổi mật khẩu thất bại.");
+    }
   };
+
+  async function handleSendOtp() {
+    const isValid = await trigger("email");
+    if (!isValid) return;
+
+    const email = getValues("email");
+
+    const result = await sendOtpAction(email);
+    if (result.success) {
+      toast.success(result.message || "Mã xác nhận đã được gửi.");
+      start();
+    } else {
+      toast.error(result.message || "Gửi mã OTP thất bại. Vui lòng thử lại.");
+    }
+  }
 
   return (
     <>
@@ -67,21 +100,33 @@ const ForgotPassword = ({
                 <div>
                   <div className="flex gap-2 items-end">
                     <div className="grid gap-1 flex-1">
-                      <Label htmlFor="code">Mã xác nhận</Label>
+                      <Label htmlFor="otp">Mã xác nhận</Label>
                       <Input
-                        id="code"
+                        id="otp"
                         type="text"
                         placeholder="Nhập mã xác nhận"
-                        {...register("code")}
+                        {...register("otp")}
                       />
                     </div>
-                    <Button type="button" className="w-22 cursor-pointer">
-                      gửi mã
+                    <Button
+                      onClick={handleSendOtp}
+                      disabled={otpCooldown > 0}
+                      type="button"
+                      className="w-22 cursor-pointer"
+                    >
+                      {otpCooldown > 0
+                        ? `${Math.floor(otpCooldown / 60)
+                            .toString()
+                            .padStart(
+                              2,
+                              "0",
+                            )}:${(otpCooldown % 60).toString().padStart(2, "0")}`
+                        : "Gửi mã"}
                     </Button>
                   </div>
-                  {errors.code?.message && (
+                  {errors.otp?.message && (
                     <p className="text-red-500 text-xs ml-1 mt-1">
-                      {errors.code?.message}
+                      {errors.otp?.message}
                     </p>
                   )}
                 </div>

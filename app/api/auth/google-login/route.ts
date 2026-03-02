@@ -1,9 +1,9 @@
-import { LoginResponse } from "@/features/auth/types/auth.type";
-import { GoogleLoginResponse } from "@/features/auth/types/googleLogin.response";
-import { apiClient } from "@/lib/apiClient";
-import { setAuthCookies } from "@/lib/token.service";
-import ApiResponse from "@/types/ApiResponse.type";
 import { NextResponse } from "next/server";
+import ApiResponse from "@/types/ApiResponse.type";
+import { setAuthCookies } from "@/features/auth/services/token.service";
+import { apiClient } from "@/lib/apiClient";
+import { GoogleLoginResponse } from "@/features/auth/types/googleLogin.response";
+import { LoginResponse } from "@/features/auth/types/auth.type";
 
 export async function POST(request: Request) {
   try {
