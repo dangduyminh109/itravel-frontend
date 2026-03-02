@@ -3,16 +3,16 @@ import { cookies } from "next/headers";
 export async function getAuthCookies() {
   const cookieStore = await cookies();
   return {
-    token: cookieStore.get("token")?.value || null,
+    accessToken: cookieStore.get("accessToken")?.value || null,
     refreshToken: cookieStore.get("refreshToken")?.value || null,
   };
 }
 
-export async function setAuthCookies(token: string, refreshToken: string) {
+export async function setAuthCookies(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies();
   cookieStore.set({
-    name: "token",
-    value: token,
+    name: "accessToken",
+    value: accessToken,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 180,

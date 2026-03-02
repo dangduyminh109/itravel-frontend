@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
     console.log("Login API response:", res);
 
     if (res && res.success) {
-      const { token, refreshToken } = res.response;
-      await setAuthCookies(token, refreshToken);
+      const { accessToken, refreshToken } = res.response;
+      await setAuthCookies(accessToken, refreshToken);
       const response: ApiResponse<null> = {
         success: true,
         message: res.message,

@@ -1,18 +1,63 @@
+import { LoginResponse } from "@/features/auth/types/auth.type";
+import { GoogleLoginResponse } from "@/features/auth/types/googleLogin.response";
+import { apiClient } from "@/lib/apiClient";
+import { setAuthCookies } from "@/lib/token.service";
+import ApiResponse from "@/types/ApiResponse.type";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
- try {
-     const formData = await request.formData();
-     const token = formData.get("accessToken") as string;
-     console.log("Token nhận được:", token);
-     const retoken = formData.get("refreshToken") as string;
-     console.log("Refresh token nhận được:", retoken);
-     
-    if (!token) {
-      return NextResponse.redirect(new URL("/vi/login?error=missing_token", request.url), 302);
+  try {
+    const { idToken } = await request.json();
+
+    if (!idToken) {
+      const response: ApiResponse<null> = {
+        success: false,
+        message: "Missing idToken",
+        response: null,
+        timestamp: new Date().toISOString(),
+      };
+      return NextResponse.json(response, { status: 401 });
     }
- } catch (error) {
-    console.error("Lỗi callback:", error);
-    return NextResponse.redirect(new URL("/vi/login?error=server_error", request.url), 302);
- }
+
+    const res = await apiClient<LoginResponse>("auth/firebase-login", {
+      method: "POST",
+      requireAuth: false,
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!res?.success) {
+      const response: ApiResponse<null> = {
+        success: false,
+        errors: res?.errors || [],
+        message: "Login failed",
+        response: null,
+        timestamp: new Date().toISOString(),
+      };
+      return NextResponse.json(response, { status: 200 });
+    }
+
+    const { accessToken, refreshToken } = await res.response;
+
+    await setAuthCookies(accessToken, refreshToken);
+
+    const successResponse: ApiResponse<GoogleLoginResponse> = {
+      success: true,
+      message: "Login successful",
+      response: {
+        username: res.response.username,
+        email: res.response.email,
+      },
+      timestamp: new Date().toISOString(),
+    };
+    
+    return NextResponse.json(successResponse, { status: 200 });
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      success: false,
+      message: "Login failed",
+      response: null,
+      timestamp: new Date().toISOString(),
+    };
+    return NextResponse.json(response, { status: 401 });
+  }
 }
