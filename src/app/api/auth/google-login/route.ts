@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       },
       timestamp: new Date().toISOString(),
     };
-    
+
     return NextResponse.json(successResponse, { status: 200 });
   } catch (error) {
     const response: ApiResponse<null> = {
