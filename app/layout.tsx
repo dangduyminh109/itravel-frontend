@@ -5,7 +5,6 @@ import "@/lib/fontawesome";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import GlobalLoading from "@/components/GlobalLoading";
-
 const robotoSlab = Nunito({
   subsets: ["latin"],
   variable: "--font-roboto-slab",
@@ -18,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" suppressHydrationWarning className={robotoSlab.variable}>
+    <html suppressHydrationWarning className={robotoSlab.variable}>
       <head>
         <script
           dangerouslySetInnerHTML={{

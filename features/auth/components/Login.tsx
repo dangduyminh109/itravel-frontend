@@ -36,7 +36,7 @@ const Login = ({
   });
   const router = useRouter();
   const { setLoading } = useLoadingStore();
-  const t = useTranslations();
+  const t = useTranslations("auth");
 
   const onSubmit = async (data: LoginSchema) => {
     setLoading(true);
@@ -64,7 +64,7 @@ const Login = ({
         >
           <Card className="w-full border-none shadow-none">
             <CardHeader className="px-3 py-1">
-              <CardTitle className="text-center font-bold text-2xl">
+              <CardTitle className="text-center font-bold text-2xl uppercase">
                 {t("login")}
               </CardTitle>
             </CardHeader>

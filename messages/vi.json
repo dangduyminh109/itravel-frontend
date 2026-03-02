@@ -1,0 +1,8 @@
+{
+    "auth": {
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "register": "Đăng ký",
+        "forgot_password": "Quên mật khẩu"
+    }
+}
