@@ -1,10 +1,10 @@
 import { Nunito } from "next/font/google";
 
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 import "@/lib/fontawesome";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-import GlobalLoading from "@/components/GlobalLoading";
+import GlobalLoading from "@/components/shared/GlobalLoading";
 const robotoSlab = Nunito({
   subsets: ["latin"],
   variable: "--font-roboto-slab",
