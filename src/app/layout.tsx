@@ -32,7 +32,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-foreground antialiased font-sans">
-        <main>{children}</main>
+        {children}
         <Toaster
           position="top-center"
           toastOptions={{

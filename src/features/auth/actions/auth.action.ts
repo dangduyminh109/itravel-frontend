@@ -1,4 +1,5 @@
 "use server";
+import { redirect } from "next/navigation";
 import {
   forgotPassword,
   login,
@@ -6,12 +7,15 @@ import {
   register,
   sendOtp,
 } from "../services/auth.service";
-import { clearAuthCookies, setAuthCookies } from "../services/token.service";
+import {
+  clearAuthCookies,
+  getAuthCookies,
+  setAuthCookies,
+} from "../services/token.service";
 
 import {
   ForgotPasswordData,
   LoginData,
-  LogoutData,
   RegisterData,
 } from "../types/AuthData.type";
 
@@ -38,10 +42,12 @@ export async function ForgotPasswordAction(data: ForgotPasswordData) {
   return result;
 }
 
-export async function LogoutAction(data: LogoutData) {
-  const result = await logout(data);
-  if (result.success) {
-    clearAuthCookies();
+export async function AdminLogoutAction(locale: string) {
+  const { refreshToken } = await getAuthCookies();
+  if (refreshToken) {
+    await logout({ refreshToken });
   }
-  return result;
+  clearAuthCookies();
+
+  redirect(`/${locale}/admin/auth`);
 }

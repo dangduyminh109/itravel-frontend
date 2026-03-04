@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --font-sans: var(--font-roboto-slab), serif;
 
@@ -106,6 +110,7 @@
   * {
     @apply border-border transition-colors duration-300;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
@@ -113,5 +118,50 @@
     h1 {
       font-size: 2rem;
     }
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #ebf4f6;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+  }
+}
+
+@layer components {
+  /* Track OFF */
+  button[role="switch"] {
+    background-color: #ebf4f6 !important;
+    border: 2px solid var(--primary);
+    transition: all 0.3s ease;
+  }
+
+  /* Track ON */
+  button[role="switch"][data-state="checked"] {
+    background-color: #ebf4f6 !important;
+    border: 2px solid var(--primary);
+  }
+
+  /* Thumb mặc định */
+  button[role="switch"] span {
+    background-color: var(--secondary) !important;
+    transition: all 0.3s ease;
+  }
+
+  /* Thumb khi ON */
+  button[role="switch"][data-state="checked"] span {
+    background-color: var(--primary) !important;
   }
 }
