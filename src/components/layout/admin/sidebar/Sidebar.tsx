@@ -53,20 +53,22 @@ const renderItem = (fileItem: SidebarItem) => {
 };
 
 const Sidebar = () => {
-  const { isOpen } = useSidebarStore();
+  const { isOpen, toggleSidebar } = useSidebarStore();
 
   return (
     <>
       {isOpen && (
-        <div className="sm:hidden fixed h-screen w-screen z-40 inset-0 bg-secondary-foreground/50 flex items-center justify-center"></div>
+        <div
+          onClick={toggleSidebar}
+          className="sm:hidden fixed h-screen w-screen z-40 inset-0 bg-secondary-foreground/50 flex items-center justify-center"
+        ></div>
       )}
       <aside
         className={`h-full z-50 
          overflow-x-hidden w-0
          bg-secondary transition-all duration-300 
          fixed md:relative text-primary-foreground 
-         box-border 
-        [&>*]:text-lg
+         [&>*]:text-lg
          ${isOpen ? "w-70 p-2" : "w-0 p-0"}`}
       >
         <div className="flex flex-col gap-1 py-2">

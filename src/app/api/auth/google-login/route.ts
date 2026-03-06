@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json(response, { status: 401 });
     }
 
-    const res = await apiClient<LoginResponse>("auth/firebase-login", {
+    const res = await apiClient<LoginResponse>("/auth/firebase-login", {
       method: "POST",
       requireAuth: false,
       body: JSON.stringify({ idToken }),
@@ -36,9 +36,9 @@ export async function POST(request: Request) {
       return NextResponse.json(response, { status: 200 });
     }
 
-    const { accessToken, refreshToken } = await res.response;
+    const { accessToken, refreshToken,expiresAt } = await res.response;
 
-    await setAuthCookies(accessToken, refreshToken);
+    await setAuthCookies(accessToken, refreshToken, expiresAt);
 
     const successResponse: ApiResponse<GoogleLoginResponse> = {
       success: true,

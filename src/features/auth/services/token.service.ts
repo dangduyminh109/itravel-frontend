@@ -12,6 +12,7 @@ export async function getAuthCookies() {
 export async function setAuthCookies(
   accessToken: string,
   refreshToken: string,
+  expiresAt: string,
 ) {
   const cookieStore = await cookies();
   cookieStore.set({
@@ -29,10 +30,19 @@ export async function setAuthCookies(
     secure: process.env.NODE_ENV === "production",
     maxAge: parseInt(process.env.NEXT_PUBLIC_REFRESHABLE_DURATION || "604800"),
   });
+
+  cookieStore.set({
+    name: "expiresAt",
+    value: expiresAt,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: parseInt(process.env.NEXT_PUBLIC_REFRESHABLE_DURATION || "604800"),
+  });
 }
 
 export async function clearAuthCookies() {
   const cookieStore = await cookies();
   cookieStore.delete("accessToken");
   cookieStore.delete("refreshToken");
+  cookieStore.delete("expiresAt");
 }

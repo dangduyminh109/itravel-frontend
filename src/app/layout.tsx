@@ -5,6 +5,7 @@ import "@/lib/fontawesome";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import GlobalLoading from "@/components/shared/GlobalLoading";
+import { TooltipProvider } from "@/components/ui/tooltip";
 const robotoSlab = Nunito({
   subsets: ["latin"],
   variable: "--font-roboto-slab",
@@ -32,15 +33,15 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-foreground antialiased font-sans">
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
         <Toaster
           position="top-center"
           toastOptions={{
             classNames: {
-              success: "!bg-[#10B981] !text-white",
-              error: "!bg-[#EF4444] !text-white",
-              warning: "!bg-[#F59E0B] !text-white",
-              info: "!bg-[#3B82F6] !text-white",
+              success: "!bg-[var(--success)] !text-white",
+              error: "!bg-[var(--error)] !text-white",
+              warning: "!bg-[var(--warning)] !text-white",
+              info: "!bg-[var(--info)] !text-white",
             },
             className: "!border-none",
           }}

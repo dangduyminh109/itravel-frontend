@@ -32,8 +32,14 @@ export async function registerAction(data: RegisterData) {
 export async function LoginAction(data: LoginData) {
   const result = await login(data);
   if (result.success) {
-    setAuthCookies(result.response.accessToken, result.response.refreshToken);
+    setAuthCookies(
+      result.response.accessToken,
+      result.response.refreshToken,
+      result.response.expiresAt,
+    );
   }
+  const cookies = await getAuthCookies();
+
   return result;
 }
 
