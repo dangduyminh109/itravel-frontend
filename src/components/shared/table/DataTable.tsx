@@ -39,6 +39,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@/components/ui/button";
 import ApiResponse, { PagingResponse } from "@/types/ApiResponse.type";
 import { toast } from "sonner";
+import { useRouter } from "@/i18n/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,7 +67,7 @@ export function DataTable<TData, TValue>({
     pageSize: 5,
   });
   const [totalPages, setTotalPages] = useState(0);
-
+  const router = useRouter();
   useEffect(() => {
     const fetchDataAndSetData = async () => {
       const result = await getData({
@@ -129,6 +130,11 @@ export function DataTable<TData, TValue>({
     }
   }
 
+  function handleToggleDetail({ row }: { row: any }) {
+    const user = row.original as any;
+    router.push(`/admin/user/${user.id}`);
+  }
+
   return (
     <div className="overflow-hidden rounded-md border bg-background border-primary">
       <div className="flex items-center p-2 gap-2">
@@ -185,6 +191,7 @@ export function DataTable<TData, TValue>({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
+                          onClick={() => handleToggleDetail({ row })}
                           variant="outline"
                           size="icon"
                           className="cursor-pointer bg-[var(--info)] hover:bg-[var(--info)] hover:opacity-80 !text-white"

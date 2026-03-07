@@ -25,6 +25,13 @@ export async function getUsers({
   return result;
 }
 
+export async function getUser(id: string): Promise<ApiResponse<User>> {
+  const result = await apiClient<User>(`/user/${id}`, {
+    method: "GET",
+  });
+  return result;
+}
+
 export async function createUsers(
   userData: CreateUserData,
 ): Promise<ApiResponse<User>> {

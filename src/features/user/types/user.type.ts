@@ -1,3 +1,5 @@
+import { Role } from "@/types/role";
+
 export interface User {
   id: string;
   username: string;
@@ -7,7 +9,7 @@ export interface User {
   gender: "MALE" | "FEMALE" | "OTHER";
   email: string;
   dateOfBirth: string;
-  roleList: number[];
+  roleList: Role[];
   permissionOverrides: Set<PermissionOverride>;
   status: "ACTIVE" | "INACTIVE" | "DELETED";
   createdAt: string;

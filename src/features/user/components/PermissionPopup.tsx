@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCaretDown,
   faScrewdriverWrench,
 } from "@fortawesome/free-solid-svg-icons";
 import { Permission } from "@/types/permission";
