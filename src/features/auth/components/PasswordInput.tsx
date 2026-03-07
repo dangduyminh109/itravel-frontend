@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 
 type PasswordInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
+  useFormError?: boolean;
 };
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ error, className, ...props }, ref) => {
+  ({ error, className, useFormError = true, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -18,6 +19,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             ref={ref}
             type={showPassword ? "text" : "password"}
             className={`pr-10 ${className ?? ""}`}
+            placeholder="Enter password"
             {...props}
           />
           <button
@@ -32,7 +34,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             />
           </button>
         </div>
-        {error && (
+        {error && useFormError && (
           <p className="text-red-500 text-xs mt-1 ml-1 max-w-80">{error}</p>
         )}
       </div>

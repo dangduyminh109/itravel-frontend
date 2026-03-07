@@ -5,13 +5,14 @@ export interface User {
   phoneNumber: string;
   avatar: string;
   gender: "MALE" | "FEMALE" | "OTHER";
-  dateOfBirth: String;
+  email: string;
+  dateOfBirth: string;
   roleList: number[];
   permissionOverrides: Set<PermissionOverride>;
   status: "ACTIVE" | "INACTIVE" | "DELETED";
-  createdAt: String;
-  updatedAt: String;
-  deletedAt: String;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 }
 
 export interface PermissionOverride {

@@ -5,22 +5,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AdminLogoutAction } from "@/features/auth/actions/auth.action";
 import { useLocale } from "next-intl";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 
 const Navbar = () => {
   const locale = useLocale();
 
   return (
     <div className="h-full flex items-center gap-2">
+      <ThemeToggle />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer h-8 w-8">
-            <AvatarImage src="" alt="@shadcn" className="grayscale" />
+            <AvatarImage src="" alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>

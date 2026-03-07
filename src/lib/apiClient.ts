@@ -28,11 +28,17 @@ export async function apiClient<T>(
 ): Promise<ApiResponse<T>> {
   const { requireAuth = true, ...fetchOptions } = options;
 
+  const headers: any = {};
+
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const config: RequestInit = {
-    ...fetchOptions,
     headers: {
-      "Content-Type": "application/json",
+      ...headers,
     },
+    ...fetchOptions,
   };
 
   if (requireAuth) {
@@ -56,7 +62,6 @@ export async function apiClient<T>(
         });
         if (authResponse.ok) {
           const authData = await authResponse.json();
-          console.log("Token refreshed successfully:", authData);
           await setAuthCookies(
             authData.accessToken,
             authData.refreshToken,
@@ -85,10 +90,8 @@ export async function apiClient<T>(
   }
 
   const res: ApiResponse<T> = await response.json();
-  console.log("API Response:", res);
   if (!response.ok && response.status === 401 && !isRetry) {
     const refreshToken = (await getAuthCookies()).refreshToken;
-    console.log("Attempting token refresh with refresh token:", refreshToken);
     if (refreshToken) {
       const authResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
         method: "POST",
@@ -101,7 +104,6 @@ export async function apiClient<T>(
       });
       if (authResponse.ok) {
         const authData = await authResponse.json();
-
         await setAuthCookies(
           authData.response.accessToken,
           authData.response.refreshToken,

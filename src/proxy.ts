@@ -4,7 +4,7 @@ export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const token = req.cookies.get("accessToken")?.value;
-  
+
   const locale = pathname.split("/")[1] || "en";
   const pathWithoutLocale = pathname.replace(`/${locale}`, "");
 

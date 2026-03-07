@@ -37,11 +37,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => (
       <div className="flex gap-2 items-center">
         <Avatar className="cursor-pointer h-8 w-8">
-          <AvatarImage
-            src={row.original.avatar}
-            alt={row.original.username}
-            className="grayscale"
-          />
+          <AvatarImage src={row.original.avatar} alt={row.original.username} />
           <AvatarFallback>
             {row.original.username.charAt(0).toUpperCase()}
           </AvatarFallback>
@@ -65,6 +61,10 @@ export const columns: ColumnDef<User>[] = [
         dateOfBirth && formatDate({ dateString: dateOfBirth, type: "date" })
       );
     },
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
   },
   {
     accessorKey: "phoneNumber",

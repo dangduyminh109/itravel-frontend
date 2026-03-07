@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="overflow-hidden rounded-md border bg-background">
+    <div className="overflow-hidden rounded-md border bg-background border-primary">
       <div className="flex items-center p-2 gap-2">
         <DataTableViewOptions table={table} />
         {hasTrash && (
@@ -145,9 +145,9 @@ export function DataTable<TData, TValue>({
         )}
       </div>
 
-      <div className="rounded-lg m-2 overflow-y-scroll max-h-100 border border-muted shadow">
+      <div className="rounded-lg m-2 overflow-scroll max-h-100 max-w-[100%] border border-muted shadow">
         <Table>
-          <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background">
+          <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

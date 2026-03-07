@@ -18,8 +18,8 @@ import { useLoadingStore } from "@/store/loading.store";
 import { adminLoginSchema } from "@/features/auth/schemas/admin-login.schema";
 import PasswordInput from "@/features/auth/components/PasswordInput";
 import { LoginAction } from "../actions/auth.action";
-type AdminLoginSchema = z.infer<typeof adminLoginSchema>;
 import { useLocale } from "next-intl";
+type AdminLoginSchema = z.infer<typeof adminLoginSchema>;
 
 const AdminLogin = () => {
   const {
@@ -47,7 +47,6 @@ const AdminLogin = () => {
     } else {
       toast.error(result.message || "Đăng nhập thất bại.");
     }
-    setLoading(false);
   };
   return (
     <>

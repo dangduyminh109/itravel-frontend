@@ -1,6 +1,4 @@
 import { Nunito } from "next/font/google";
-
-import ThemeToggle from "@/components/shared/ThemeToggle";
 import "@/lib/fontawesome";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -47,7 +45,6 @@ export default function RootLayout({
           }}
         />
         <GlobalLoading />
-        <ThemeToggle />
       </body>
     </html>
   );

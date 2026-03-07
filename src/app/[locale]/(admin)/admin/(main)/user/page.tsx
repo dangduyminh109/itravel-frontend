@@ -24,7 +24,7 @@ const page = () => {
   const locale = useLocale();
   const searchRef = useRef<HTMLInputElement>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
-  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+  function handleSearch(e: any) {
     e.preventDefault();
     const keyword = searchRef.current?.value || "";
     setSearchKeyword(keyword);
@@ -33,7 +33,7 @@ const page = () => {
   return (
     <div className="h-full w-full">
       <CustomBreadcrumb {...breadcrumbData} />
-      <div className="flex items-center justify-between px-2">
+      <div className="flex items-center justify-between mt-2">
         <form onSubmit={handleSearch} className="w-full max-w-100">
           <Field orientation="horizontal">
             <Input
@@ -52,7 +52,7 @@ const page = () => {
           New User
         </Button>
       </div>
-      <div className="p-2">
+      <div className="mt-2">
         <DataTable
           columns={columns}
           getData={getUsers}

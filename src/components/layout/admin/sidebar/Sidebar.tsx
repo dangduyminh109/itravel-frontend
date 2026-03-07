@@ -60,7 +60,7 @@ const Sidebar = () => {
       {isOpen && (
         <div
           onClick={toggleSidebar}
-          className="sm:hidden fixed h-screen w-screen z-40 inset-0 bg-secondary-foreground/50 flex items-center justify-center"
+          className="md:hidden fixed h-screen w-screen z-40 inset-0 bg-secondary-foreground/50 flex items-center justify-center"
         ></div>
       )}
       <aside

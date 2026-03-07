@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { type Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -22,6 +23,18 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  useEffect(() => {
+    const pageSize = localStorage.getItem("pageSize");
+    if (pageSize) {
+      table.setPageSize(Number(pageSize));
+    }
+  }, []);
+
+  function handlePageChange(size: number) {
+    localStorage.setItem("pageSize", size.toString());
+    table.setPageSize(size);
+  }
+
   return (
     <div className="flex items-center justify-between p-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -33,9 +46,7 @@ export function DataTablePagination<TData>({
           <p className="text-sm font-medium">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
+            onValueChange={(value) => handlePageChange(Number(value))}
           >
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />

@@ -10,11 +10,10 @@ export function useTheme() {
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  const toggleTheme = (theme: "light" | "dark") => {
+    setTheme(theme);
+    localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
   };
 
   return { theme, toggleTheme };

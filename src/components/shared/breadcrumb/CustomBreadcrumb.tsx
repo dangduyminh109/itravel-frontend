@@ -34,7 +34,7 @@ export function CustomBreadcrumb({
   listBreadcrumb,
 }: CustomBreadcrumbProps) {
   return (
-    <div className="p-2">
+    <div>
       <h1 className="font-bold text-xl">{title}</h1>
       <Separator className="mb-1" />
       <Breadcrumb>
