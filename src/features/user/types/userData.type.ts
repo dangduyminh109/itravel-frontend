@@ -9,6 +9,20 @@ export interface CreateUserData {
   gender?: string;
   phoneNumber?: string;
   roleList: string[];
-  permissionOverrides?: PermissionOverride[];
+  permissionOverrides?: Set<PermissionOverride>;
+  avatar?: File;
+}
+
+export interface UpdateUserData {
+  id: string;
+  fullName: string;
+  status: string;
+  email?: string;
+  newPassword?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  phoneNumber?: string;
+  roleList: Set<string>;
+  permissionOverrides?: Set<PermissionOverride>;
   avatar?: File;
 }

@@ -41,15 +41,15 @@ export async function apiClient<T>(
     ...fetchOptions,
   };
 
+  const { accessToken, refreshToken } = await getAuthCookies();
   if (requireAuth) {
-    const token = (await getAuthCookies()).accessToken;
+    const token = accessToken;
     if (token) {
       config.headers = {
         ...config.headers,
         Authorization: `Bearer ${token}`,
       };
     } else {
-      const refreshToken = (await getAuthCookies()).refreshToken;
       if (refreshToken) {
         const authResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
           method: "POST",
@@ -91,7 +91,6 @@ export async function apiClient<T>(
 
   const res: ApiResponse<T> = await response.json();
   if (!response.ok && response.status === 401 && !isRetry) {
-    const refreshToken = (await getAuthCookies()).refreshToken;
     if (refreshToken) {
       const authResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
         method: "POST",
@@ -110,7 +109,7 @@ export async function apiClient<T>(
           authData.response.expiresAt,
         );
 
-        return apiClient<T>(endpoint, options, true);
+        return apiClient<T>(endpoint, options, isAdmin, true);
       } else {
         await handleRedirect(isAdmin);
       }

@@ -19,14 +19,14 @@ const RolePopup = ({
   setSelectedRole,
   selectedRole,
 }: {
-  setSelectedRole: React.Dispatch<React.SetStateAction<Role[]>>;
-  selectedRole: Role[];
+  setSelectedRole: React.Dispatch<React.SetStateAction<Set<Role>>>;
+  selectedRole: Set<Role>;
 }) => {
-  const [roleList, setRoleList] = useState<Role[]>([]);
+  const [roleList, setRoleList] = useState<Set<Role>>(new Set());
   useEffect(() => {
     async function fetchRoles() {
       const result = await getRoles("ACTIVE");
-      setRoleList(result.response);
+      setRoleList(new Set(result.response));
     }
     fetchRoles();
   }, []);
@@ -36,9 +36,12 @@ const RolePopup = ({
     checked: boolean | "indeterminate",
   ) {
     if (checked) {
-      setSelectedRole((prev) => [...prev, role]);
+      setSelectedRole((prev) => new Set([...prev, role]));
     } else {
-      setSelectedRole((prev) => prev.filter((r) => r.id !== role.id));
+      setSelectedRole((prev) => {
+        const newSet = new Set(prev);
+        return new Set([...newSet].filter((r) => r.id !== role.id));
+      });
     }
   }
 
@@ -56,7 +59,7 @@ const RolePopup = ({
           </DialogHeader>
           <FieldGroup className="max-w-sm max-h-[400px] overflow-y-auto">
             {roleList &&
-              roleList.map((role) => {
+              [...roleList].map((role) => {
                 return (
                   <Field orientation="horizontal" key={role.id}>
                     <Checkbox
@@ -66,7 +69,7 @@ const RolePopup = ({
                       onCheckedChange={(checked) =>
                         handleSeledtedRoleChange(role, checked)
                       }
-                      checked={selectedRole.some((r) => r.id === role.id)}
+                      checked={[...selectedRole].some((r) => r.id === role.id)}
                     />
                     <Label className="rounded-sm" htmlFor={role.id}>
                       {role.name}

@@ -1,7 +1,7 @@
 import { apiClient } from "@/lib/apiClient";
 import { User } from "../types/user.type";
 import ApiResponse, { PagingResponse } from "@/types/ApiResponse.type";
-import { CreateUserData } from "../types/userData.type";
+import { CreateUserData, UpdateUserData } from "../types/userData.type";
 
 interface GetUsersProps {
   deleted: boolean;
@@ -77,6 +77,57 @@ export async function createUsers(
   }
   const result = await apiClient<User>(`/user`, {
     method: "POST",
+    body: data,
+  });
+  return result;
+}
+
+export async function updateUsers(
+  userData: UpdateUserData,
+): Promise<ApiResponse<User>> {
+  const data = new FormData();
+  data.append("fullName", userData.fullName);
+  data.append("status", userData.status);
+
+  if (userData.email) {
+    data.append("email", userData.email);
+  }
+  if (userData.newPassword) {
+    data.append("newPassword", userData.newPassword);
+  }
+  if (userData.dateOfBirth) {
+    data.append("dateOfBirth", userData.dateOfBirth);
+  }
+  if (userData.gender) {
+    data.append("gender", userData.gender);
+  }
+  if (userData.phoneNumber) {
+    data.append("phoneNumber", userData.phoneNumber);
+  }
+
+  if (userData.avatar) {
+    data.append("avatar", userData.avatar);
+  } else {
+    data.append("avatar", new Blob(), "");
+  }
+
+  userData.roleList.forEach((roleId) => {
+    data.append("roleList", roleId);
+  });
+  if (userData.permissionOverrides) {
+    userData.permissionOverrides.forEach((override, index) => {
+      data.append(
+        `permissionOverrides[${index}].permission`,
+        override.permission,
+      );
+      data.append(
+        `permissionOverrides[${index}].permissionType`,
+        override.permissionType,
+      );
+    });
+  }
+  const result = await apiClient<User>(`/user/${userData.id}`, {
+    method: "PUT",
     body: data,
   });
   return result;

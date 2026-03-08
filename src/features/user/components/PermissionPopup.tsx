@@ -25,9 +25,9 @@ const PermissionPopup = ({
   setPermissionOverrides,
 }: {
   defaultSelectedPermissions: string[];
-  permissionOverrides: PermissionOverride[];
+  permissionOverrides: Set<PermissionOverride>;
   setPermissionOverrides: React.Dispatch<
-    React.SetStateAction<PermissionOverride[]>
+    React.SetStateAction<Set<PermissionOverride>>
   >;
 }) => {
   const [permissionList, setPermissionList] = useState<Permission[]>([]);
@@ -50,12 +50,12 @@ const PermissionPopup = ({
   ) {
     if (defaultSelectedPermissions.includes(permission.code)) {
       if (checked) {
-        const newList: PermissionOverride[] = permissionOverrides.filter(
+        const newList: PermissionOverride[] = [...permissionOverrides].filter(
           (override) => {
             return override.permission !== permission.code;
           },
         );
-        setPermissionOverrides([...newList]);
+        setPermissionOverrides(new Set(newList));
       } else {
         const newList: PermissionOverride[] = [
           ...permissionOverrides,
@@ -64,7 +64,7 @@ const PermissionPopup = ({
             permissionType: "DENY",
           },
         ];
-        setPermissionOverrides([...newList]);
+        setPermissionOverrides(new Set([...newList]));
       }
     } else {
       if (checked) {
@@ -75,7 +75,7 @@ const PermissionPopup = ({
             permissionType: "GRANT",
           },
         ];
-        setPermissionOverrides([...newList]);
+        setPermissionOverrides(new Set([...newList]));
       }
     }
   }
@@ -112,13 +112,13 @@ const PermissionPopup = ({
                         handleSelectedPermissionChange(permission, checked)
                       }
                       checked={
-                        permissionOverrides.some(
+                        [...permissionOverrides].some(
                           (p) =>
                             p.permission === permission.code &&
                             p.permissionType === "GRANT",
                         ) ||
                         (defaultSelectedPermissions.includes(permission.code) &&
-                          !permissionOverrides.some(
+                          ![...permissionOverrides].some(
                             (p) =>
                               p.permission === permission.code &&
                               p.permissionType === "DENY",

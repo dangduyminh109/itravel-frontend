@@ -21,20 +21,20 @@ const page = async ({
 }: {
   params: Promise<{ locale: string; id: string }>;
 }) => {
+  const { id } = await params;
   const breadcrumbData = {
     title: "User detail",
     listBreadcrumb: [
       { name: "Dashboard", href: "/admin/dashboard" },
       { name: "User", href: "/admin/user" },
-      { name: "User detail", href: "" },
+      { name: "User detail", href: `/admin/user/${id}` },
     ],
   };
-  const { id } = await params;
   const result = await getUser(id);
   const user = result.response;
-  const permissionList = [
-    ...new Set(user.roleList.flatMap((role) => role.permissionList)),
-  ];
+  const permissionList = [...user.roleList].flatMap(
+    (role) => role.permissionList,
+  );
   const permissionResult = await getPermissions();
 
   return (
@@ -132,7 +132,7 @@ const page = async ({
                     </div>
                   </div>
                   <div className="shadow p-2 border rounded-md flex gap-2">
-                    {user.roleList.map((role) => {
+                    {[...user.roleList].map((role) => {
                       return <Badge key={role.name}>{role.name}</Badge>;
                     })}
                   </div>

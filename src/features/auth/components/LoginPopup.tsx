@@ -36,7 +36,6 @@ export default function LoginPopup() {
       }
     } catch (error) {
       toast.error("Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.");
-      console.error("Lỗi đăng nhập:", error);
     }
   };
 

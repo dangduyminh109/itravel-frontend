@@ -1,19 +1,26 @@
 "use client";
-import * as React from "react";
 import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { createUserSchema } from "@/features/user/schemas/create-user.schema";
-import { Controller, useForm } from "react-hook-form";
+import { updateUserSchema } from "@/features/user/schemas/update-user.schema";
+import { getUser, updateUsers } from "@/features/user/services/user.service";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { useLoadingStore } from "@/store/loading.store";
+import { Label } from "@/components/ui/label";
+import PasswordInput from "@/features/auth/components/PasswordInput";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Input } from "@/components/ui/input";
+import { faUpload, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { formatDate } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -22,81 +29,79 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDate } from "@/lib/utils";
-import PasswordInput from "@/features/auth/components/PasswordInput";
-import { useRouter } from "next/dist/client/components/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/dist/client/components/navigation";
+import { PermissionOverride, User } from "@/features/user/types/user.type";
+import { Role } from "@/types/role";
 import RolePopup from "@/features/user/components/RolePopup";
 import { Badge } from "@/components/ui/badge";
-import { faUpload, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PermissionPopup from "@/features/user/components/PermissionPopup";
-import { Role } from "@/types/role";
-import { PermissionOverride } from "@/features/user/types/user.type";
-import { createUsers } from "@/features/user/services/user.service";
-import { CreateUserData } from "@/features/user/types/userData.type";
-import { useLoadingStore } from "@/store/loading.store";
-type CreateUserSchema = z.infer<typeof createUserSchema>;
+import { toast } from "sonner";
+import { UpdateUserData } from "@/features/user/types/userData.type";
+type UpdateUserSchema = z.infer<typeof updateUserSchema>;
 
 const page = () => {
+  const { id } = useParams<{ id: string }>();
+
   const breadcrumbData = {
-    title: "Create User",
+    title: "Edit User",
     listBreadcrumb: [
       { name: "Dashboard", href: "/admin/dashboard" },
       { name: "User", href: "/admin/user" },
-      { name: "Create User", href: "/admin/user/create" },
+      { name: "Edit User", href: `/admin/user/${id}/edit` },
     ],
   };
-  const router = useRouter();
-  const { setLoading } = useLoadingStore();
   const [open, setOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Set<Role>>(new Set());
   const avatarRef = useRef<HTMLInputElement>(null);
   const [avartarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { setLoading } = useLoadingStore();
+  const [user, setUser] = useState<User | null>(null);
   const [permissionOverrides, setPermissionOverrides] = useState<
     Set<PermissionOverride>
   >(new Set());
 
+  const [selectedRole, setSelectedRole] = useState<Set<Role>>(new Set());
+
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
-  } = useForm<CreateUserSchema>({
-    resolver: zodResolver(createUserSchema),
+    setValue,
+    control,
+  } = useForm<UpdateUserSchema>({
+    resolver: zodResolver(updateUserSchema),
     defaultValues: {
       gender: "MALE",
+      status: "ACTIVE",
     },
   });
 
-  const onSubmit = async (data: CreateUserSchema) => {
-    if ([...selectedRole].length === 0) {
-      toast.error("Please select at least one role for the user.");
-      return;
-    }
-    const userData: CreateUserData = {
-      username: data.username,
-      fullName: data.fullName,
-      email: data.email,
-      password: data.password,
-      dateOfBirth: data.dateOfBirth,
-      gender: data.gender,
-      phoneNumber: data.phoneNumber,
-      roleList: [...selectedRole].map((role) => role.id),
-      permissionOverrides: permissionOverrides,
-      avatar: avatarRef.current?.files?.[0] || undefined,
+  useEffect(() => {
+    const fetchUser = async () => {
+      const result = await getUser(id);
+      if (result.success) {
+        const userData = result.response;
+        setValue("fullName", userData.fullName);
+        setValue("email", userData.email || "");
+        setValue("phoneNumber", userData.phoneNumber || "");
+        setValue("gender", userData.gender || "");
+        setValue("status", userData.status || "");
+        setPermissionOverrides(userData.permissionOverrides || []);
+        setSelectedRole(
+          userData.roleList ? new Set(userData.roleList) : new Set(),
+        );
+        setValue(
+          "dateOfBirth",
+          userData.dateOfBirth ? userData.dateOfBirth : undefined,
+        );
+        setUser(userData);
+        if (userData.avatar) {
+          setAvatarUrl(userData.avatar);
+        }
+      }
     };
-    setLoading(true);
-    const result = await createUsers(userData);
-    if (result.success) {
-      toast.success(result.message || "Create user successfully!");
-    } else {
-      toast.error(result.message || "Failed to create user.");
-    }
-    setLoading(false);
-  };
+    fetchUser();
+  }, [id]);
+  const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -105,22 +110,46 @@ const page = () => {
     }
   };
 
-  function defaultPermission() {
-    return [...selectedRole].flatMap((role) => {
-      return role.permissionList.map((permission) => permission);
-    });
-  }
-
-  useEffect(() => {
-    setPermissionOverrides(new Set());
-  }, [selectedRole]);
-
   function handleRemoveAvatar() {
     setAvatarUrl(null);
     if (avatarRef.current) {
       avatarRef.current.value = "";
     }
   }
+
+  function defaultPermission() {
+    return [...selectedRole].flatMap((role) => {
+      return role.permissionList.map((permission) => permission);
+    });
+  }
+
+  const onSubmit = async (data: UpdateUserSchema) => {
+    if (selectedRole.size === 0) {
+      toast.error("Please select at least one role for the user.");
+      return;
+    }
+    const userData: UpdateUserData = {
+      id: id,
+      fullName: data.fullName,
+      email: data.email,
+      status: data.status,
+      newPassword: data.newPassword,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      phoneNumber: data.phoneNumber,
+      roleList: new Set([...selectedRole].map((role) => role.id)),
+      permissionOverrides: permissionOverrides,
+      avatar: avatarRef.current?.files?.[0] || undefined,
+    };
+    setLoading(true);
+    const result = await updateUsers(userData);
+    if (result.success) {
+      toast.success(result.message || "Update user successfully!");
+    } else {
+      toast.error(result.message || "Failed to update user.");
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="w-full">
@@ -130,33 +159,70 @@ const page = () => {
           <div className="col-span-5 md:col-span-3">
             <h3 className="font-bold">Account Information</h3>
             <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
-              <div>
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter username"
-                  {...register("username")}
-                />
-                {errors.username?.message && (
-                  <p className="mt-1 text-red-500 text-xs ml-1">
-                    {errors.username?.message}
+              <div className="grid gap-2 grid-cols-3">
+                <div className="col-span-3 md:col-span-2">
+                  <p>
+                    Username{" "}
+                    <span className="italic text-[var(--info)]">
+                      (read-only)
+                    </span>
                   </p>
-                )}
+                  <div className="shadow px-3 py-1 border rounded-md">
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="mr-2 text-primary"
+                    />
+                    {user?.username}
+                  </div>
+                </div>
+                <div className="col-span-3 md:col-span-1">
+                  <div>
+                    <Controller
+                      name="status"
+                      control={control}
+                      render={({ field }) => (
+                        <Field className="gap-1 w-full">
+                          <FieldLabel htmlFor="status">Status</FieldLabel>
+
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger id="status" className="w-full">
+                              <SelectValue placeholder="select status" />
+                            </SelectTrigger>
+
+                            <SelectContent className="bg-background">
+                              <SelectGroup>
+                                <SelectItem value="ACTIVE">Active</SelectItem>
+                                <SelectItem value="INACTIVE">
+                                  Inactive
+                                </SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          {errors.status?.message && (
+                            <p className="mt-1 text-red-500 text-xs ml-1">
+                              {errors.status?.message}
+                            </p>
+                          )}
+                        </Field>
+                      )}
+                    />
+                  </div>
+                </div>
               </div>
               <div className="grid gap-1">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Mật khẩu</Label>
-                </div>
                 <PasswordInput
-                  id="password"
-                  {...register("password")}
-                  error={errors.password?.message}
+                  id="newPassword"
+                  title="New Password"
+                  {...register("newPassword")}
+                  error={errors.newPassword?.message}
                   useFormError={false}
                 />
-                {errors.password?.message && (
+                {errors.newPassword?.message && (
                   <p className="mt-1 text-red-500 text-xs ml-1">
-                    {errors.password?.message}
+                    {errors.newPassword?.message}
                   </p>
                 )}
               </div>

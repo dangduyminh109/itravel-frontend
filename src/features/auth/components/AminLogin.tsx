@@ -7,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,9 +14,19 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useLoadingStore } from "@/store/loading.store";
 import { adminLoginSchema } from "@/features/auth/schemas/admin-login.schema";
-import PasswordInput from "@/features/auth/components/PasswordInput";
 import { LoginAction } from "../actions/auth.action";
 import { useLocale } from "next-intl";
+import PasswordInput from "./PasswordInput";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 type AdminLoginSchema = z.infer<typeof adminLoginSchema>;
 
 const AdminLogin = () => {
@@ -64,24 +72,34 @@ const AdminLogin = () => {
             <CardContent className="p-3">
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1">
-                  <Label htmlFor="username">Tên đăng nhập</Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="Tên đăng nhập"
-                    {...register("username")}
-                  />
-                  {errors.username?.message && (
-                    <p className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.username.message}
-                    </p>
-                  )}
+                  <Field className="gap-1">
+                    <FieldLabel htmlFor="inline-start-input">
+                      Tên đăng nhập
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="username"
+                        type="text"
+                        placeholder="Tên đăng nhập"
+                        {...register("username")}
+                      />
+                      <InputGroupAddon align="inline-start">
+                        <FontAwesomeIcon
+                          className={"text-primary"}
+                          icon={faUser}
+                        />
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {errors.username?.message && (
+                      <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                        {errors.username.message}
+                      </FieldDescription>
+                    )}
+                  </Field>
                 </div>
                 <div className="grid gap-1">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Mật khẩu</Label>
-                  </div>
                   <PasswordInput
+                    title="Mật Khẩu"
                     id="password"
                     {...register("password")}
                     error={errors.password?.message}

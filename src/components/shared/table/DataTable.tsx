@@ -135,6 +135,11 @@ export function DataTable<TData, TValue>({
     router.push(`/admin/user/${user.id}`);
   }
 
+  function handleToggleEdit({ row }: { row: any }) {
+    const user = row.original as any;
+    router.push(`/admin/user/${user.id}/edit`);
+  }
+
   return (
     <div className="overflow-hidden rounded-md border bg-background border-primary">
       <div className="flex items-center p-2 gap-2">
@@ -222,6 +227,7 @@ export function DataTable<TData, TValue>({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
+                            onClick={() => handleToggleEdit({ row })}
                             variant="outline"
                             size="icon"
                             className="cursor-pointer bg-[var(--warning)] hover:bg-[var(--warning)] hover:opacity-80 !text-white"

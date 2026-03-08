@@ -9,7 +9,7 @@ export interface User {
   gender: "MALE" | "FEMALE" | "OTHER";
   email: string;
   dateOfBirth: string;
-  roleList: Role[];
+  roleList: Set<Role>;
   permissionOverrides: Set<PermissionOverride>;
   status: "ACTIVE" | "INACTIVE" | "DELETED";
   createdAt: string;
