@@ -82,17 +82,13 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue<"ACTIVE" | "INACTIVE" | "DELETED">("status");
+      const status = row.getValue<"ACTIVE" | "INACTIVE">("status");
       return status === "ACTIVE" ? (
         <Badge className="bg-[var(--success)] hover:bg-[var(--success)]">
           {status}
         </Badge>
-      ) : status === "INACTIVE" ? (
-        <Badge className="bg-[var(--warning)] hover:bg-[var(--warning)]">
-          {status}
-        </Badge>
       ) : (
-        <Badge className="bg-[var(--error)] hover:bg-[var(--error)]">
+        <Badge className="bg-[var(--warning)] hover:bg-[var(--warning)]">
           {status}
         </Badge>
       );

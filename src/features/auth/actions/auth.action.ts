@@ -38,8 +38,6 @@ export async function LoginAction(data: LoginData) {
       result.response.expiresAt,
     );
   }
-  const cookies = await getAuthCookies();
-
   return result;
 }
 

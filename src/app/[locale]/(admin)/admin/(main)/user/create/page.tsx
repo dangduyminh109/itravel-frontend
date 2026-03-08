@@ -41,10 +41,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PermissionPopup from "@/features/user/components/PermissionPopup";
 import { Role } from "@/types/role";
 import { PermissionOverride } from "@/features/user/types/user.type";
-import { createUsers } from "@/features/user/services/user.service";
+import { createUser } from "@/features/user/services/user.service";
 import { CreateUserData } from "@/features/user/types/userData.type";
 import { useLoadingStore } from "@/store/loading.store";
-type CreateUserSchema = z.infer<typeof createUserSchema>;
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FieldDescription } from "@/components/ui/field";
 import {
@@ -52,6 +51,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+type createUserSchema = z.infer<typeof createUserSchema>;
 
 const page = () => {
   const breadcrumbData = {
@@ -77,14 +77,14 @@ const page = () => {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<CreateUserSchema>({
+  } = useForm<createUserSchema>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
       gender: "MALE",
     },
   });
 
-  const onSubmit = async (data: CreateUserSchema) => {
+  const onSubmit = async (data: createUserSchema) => {
     if ([...selectedRole].length === 0) {
       toast.error("Please select at least one role for the user.");
       return;
@@ -97,12 +97,12 @@ const page = () => {
       dateOfBirth: data.dateOfBirth,
       gender: data.gender,
       phoneNumber: data.phoneNumber,
-      roleList: [...selectedRole].map((role) => role.id),
+      roleList: new Set([...selectedRole].map((role) => role.id)),
       permissionOverrides: permissionOverrides,
       avatar: avatarRef.current?.files?.[0] || undefined,
     };
     setLoading(true);
-    const result = await createUsers(userData);
+    const result = await createUser(userData);
     if (result.success) {
       toast.success(result.message || "Create user successfully!");
     } else {

@@ -27,13 +27,11 @@ export async function apiClient<T>(
   isRetry = false,
 ): Promise<ApiResponse<T>> {
   const { requireAuth = true, ...fetchOptions } = options;
-
   const headers: any = {};
 
   if (!(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
-
   const config: RequestInit = {
     headers: {
       ...headers,
@@ -90,7 +88,7 @@ export async function apiClient<T>(
   }
 
   const res: ApiResponse<T> = await response.json();
-  if (!response.ok && response.status === 401 && !isRetry) {
+  if (!response.ok && response.status === 401 && requireAuth && !isRetry) {
     if (refreshToken) {
       const authResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
         method: "POST",

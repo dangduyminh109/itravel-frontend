@@ -8,7 +8,7 @@ export interface CreateUserData {
   dateOfBirth?: string;
   gender?: string;
   phoneNumber?: string;
-  roleList: string[];
+  roleList: Set<string>;
   permissionOverrides?: Set<PermissionOverride>;
   avatar?: File;
 }

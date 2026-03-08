@@ -2,7 +2,7 @@
 import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { columns } from "@/features/user/components/table/Column";
 import { DataTable } from "@/components/shared/table/DataTable";
-import { deleteUsers, getUsers } from "@/features/user/services/user.service";
+import { deleteUser, getUsers, restoreUser } from "@/features/user/services/user.service";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -57,7 +57,8 @@ const page = () => {
           columns={columns}
           getData={getUsers}
           hasTrash={true}
-          deleteAction={deleteUsers}
+          deleteAction={deleteUser}
+          restoreAction={restoreUser}
           searchKeyword={searchKeyword}
         />
       </div>

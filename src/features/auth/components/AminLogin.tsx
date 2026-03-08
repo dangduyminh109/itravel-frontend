@@ -25,6 +25,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useEffect } from "react";
 type AdminLoginSchema = z.infer<typeof adminLoginSchema>;
 
 const AdminLogin = () => {
@@ -38,7 +39,9 @@ const AdminLogin = () => {
   const router = useRouter();
   const { setLoading } = useLoadingStore();
   const locale = useLocale();
-
+  useEffect(() => {
+    setLoading(false);
+  }, []);
   const onSubmit = async (data: AdminLoginSchema) => {
     setLoading(true);
     const result = await LoginAction({
@@ -48,7 +51,7 @@ const AdminLogin = () => {
     setLoading(false);
 
     if (result.success) {
-      toast.success("Đăng nhập thành công!");
+      toast.success(result.message || "Đăng nhập thành công!");
       router.push(`/${locale}/admin/dashboard`);
     } else {
       toast.error(result.message || "Đăng nhập thất bại.");

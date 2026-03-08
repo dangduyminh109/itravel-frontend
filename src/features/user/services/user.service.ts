@@ -17,7 +17,7 @@ export async function getUsers({
   keyword,
 }: GetUsersProps): Promise<ApiResponse<PagingResponse<User[]>>> {
   const result = await apiClient<PagingResponse<User[]>>(
-    `/user?deleted=${deleted}&page=${page}&size=${size}${keyword ? `&keyword=${keyword}` : ""}`,
+    `/user?isDeleted=${deleted}&page=${page}&size=${size}${keyword ? `&keyword=${keyword}` : ""}`,
     {
       method: "GET",
     },
@@ -32,7 +32,7 @@ export async function getUser(id: string): Promise<ApiResponse<User>> {
   return result;
 }
 
-export async function createUsers(
+export async function createUser(
   userData: CreateUserData,
 ): Promise<ApiResponse<User>> {
   const data = new FormData();
@@ -60,11 +60,11 @@ export async function createUsers(
     data.append("avatar", new Blob(), "");
   }
 
-  userData.roleList.forEach((roleId) => {
+  [...userData.roleList].forEach((roleId) => {
     data.append("roleList", roleId);
   });
   if (userData.permissionOverrides) {
-    userData.permissionOverrides.forEach((override, index) => {
+    [...userData.permissionOverrides].forEach((override, index) => {
       data.append(
         `permissionOverrides[${index}].permission`,
         override.permission,
@@ -82,7 +82,7 @@ export async function createUsers(
   return result;
 }
 
-export async function updateUsers(
+export async function updateUser(
   userData: UpdateUserData,
 ): Promise<ApiResponse<User>> {
   const data = new FormData();
@@ -111,11 +111,11 @@ export async function updateUsers(
     data.append("avatar", new Blob(), "");
   }
 
-  userData.roleList.forEach((roleId) => {
+  [...userData.roleList].forEach((roleId) => {
     data.append("roleList", roleId);
   });
   if (userData.permissionOverrides) {
-    userData.permissionOverrides.forEach((override, index) => {
+    [...userData.permissionOverrides].forEach((override, index) => {
       data.append(
         `permissionOverrides[${index}].permission`,
         override.permission,
@@ -133,9 +133,22 @@ export async function updateUsers(
   return result;
 }
 
-export async function deleteUsers(id: string): Promise<ApiResponse<null>> {
-  const result = await apiClient<null>(`/user/${id}`, {
-    method: "DELETE",
+export async function deleteUser(
+  id: string,
+  destroy?: boolean,
+): Promise<ApiResponse<null>> {
+  const result = await apiClient<null>(
+    `/user/${id}${destroy ? "/destroy" : ""}`,
+    {
+      method: "DELETE",
+    },
+  );
+  return result;
+}
+
+export async function restoreUser(id: string): Promise<ApiResponse<null>> {
+  const result = await apiClient<null>(`/user/${id}/restore`, {
+    method: "PATCH",
   });
   return result;
 }

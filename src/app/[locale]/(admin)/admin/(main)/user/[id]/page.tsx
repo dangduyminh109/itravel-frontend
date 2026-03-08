@@ -74,9 +74,7 @@ const page = async ({
                         className={
                           user.status === "ACTIVE"
                             ? "bg-[var(--success)] hover:bg-[var(--success)]"
-                            : user.status === "INACTIVE"
-                              ? "bg-[var(--warning)] hover:bg-[var(--warning)]"
-                              : "bg-[var(--error)] hover:bg-[var(--error)]"
+                            : "bg-[var(--error)] hover:bg-[var(--error)]"
                         }
                       >
                         {user.status}

@@ -1,7 +1,7 @@
 "use client";
 import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { updateUserSchema } from "@/features/user/schemas/update-user.schema";
-import { getUser, updateUsers } from "@/features/user/services/user.service";
+import { getUser, updateUser } from "@/features/user/services/user.service";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -48,7 +48,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-type UpdateUserSchema = z.infer<typeof updateUserSchema>;
+type updateUserSchema = z.infer<typeof updateUserSchema>;
 
 const page = () => {
   const { id } = useParams<{ id: string }>();
@@ -78,7 +78,7 @@ const page = () => {
     formState: { errors },
     setValue,
     control,
-  } = useForm<UpdateUserSchema>({
+  } = useForm<updateUserSchema>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       gender: "MALE",
@@ -134,7 +134,7 @@ const page = () => {
     });
   }
 
-  const onSubmit = async (data: UpdateUserSchema) => {
+  const onSubmit = async (data: updateUserSchema) => {
     if (selectedRole.size === 0) {
       toast.error("Please select at least one role for the user.");
       return;
@@ -153,7 +153,7 @@ const page = () => {
       avatar: avatarRef.current?.files?.[0] || undefined,
     };
     setLoading(true);
-    const result = await updateUsers(userData);
+    const result = await updateUser(userData);
     if (result.success) {
       toast.success(result.message || "Update user successfully!");
     } else {

@@ -16,11 +16,9 @@ export const updateUserSchema = z.object({
     .optional()
     .or(z.literal("")),
 
-  status: z
-    .string()
-    .regex(/^(ACTIVE|INACTIVE|DELETED)$/, {
-      message: "Trạng thái không hợp lệ",
-    }),
+  status: z.string().regex(/^(ACTIVE|INACTIVE)$/, {
+    message: "Trạng thái không hợp lệ",
+  }),
 
   dateOfBirth: z
     .string()

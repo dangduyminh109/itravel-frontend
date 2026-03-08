@@ -11,7 +11,7 @@ export interface User {
   dateOfBirth: string;
   roleList: Set<Role>;
   permissionOverrides: Set<PermissionOverride>;
-  status: "ACTIVE" | "INACTIVE" | "DELETED";
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
   deletedAt: string;
