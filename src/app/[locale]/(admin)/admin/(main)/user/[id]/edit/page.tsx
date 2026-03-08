@@ -7,13 +7,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useLoadingStore } from "@/store/loading.store";
-import { Label } from "@/components/ui/label";
 import PasswordInput from "@/features/auth/components/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Input } from "@/components/ui/input";
-import { faUpload, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  faAddressCard,
+  faEnvelope,
+  faPhone,
+  faUpload,
+  faUser,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import {
   Popover,
   PopoverContent,
@@ -37,6 +43,11 @@ import { Badge } from "@/components/ui/badge";
 import PermissionPopup from "@/features/user/components/PermissionPopup";
 import { toast } from "sonner";
 import { UpdateUserData } from "@/features/user/types/userData.type";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 type UpdateUserSchema = z.infer<typeof updateUserSchema>;
 
 const page = () => {
@@ -53,7 +64,7 @@ const page = () => {
   const [open, setOpen] = useState(false);
   const avatarRef = useRef<HTMLInputElement>(null);
   const [avartarUrl, setAvatarUrl] = useState<string | null>(null);
-  const { setLoading } = useLoadingStore();
+  const { isLoading, setLoading } = useLoadingStore();
   const [user, setUser] = useState<User | null>(null);
   const [permissionOverrides, setPermissionOverrides] = useState<
     Set<PermissionOverride>
@@ -85,7 +96,7 @@ const page = () => {
         setValue("phoneNumber", userData.phoneNumber || "");
         setValue("gender", userData.gender || "");
         setValue("status", userData.status || "");
-        setPermissionOverrides(userData.permissionOverrides || []);
+        setPermissionOverrides(new Set(userData.permissionOverrides || []));
         setSelectedRole(
           userData.roleList ? new Set(userData.roleList) : new Set(),
         );
@@ -295,49 +306,79 @@ const page = () => {
             <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
               <div className="grid gap-2">
                 <div>
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Enter fullName"
-                    {...register("fullName")}
-                  />
-                  {errors.fullName?.message && (
-                    <p className="mt-1 text-red-500 text-xs ml-1">
-                      {errors.fullName?.message}
-                    </p>
-                  )}
+                  <Field>
+                    <FieldLabel htmlFor="inline-start-input">
+                      Full Name
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="fullName"
+                        type="text"
+                        placeholder="Full Name"
+                        {...register("fullName")}
+                      />
+                      <InputGroupAddon align="inline-start">
+                        <FontAwesomeIcon
+                          className={"text-primary"}
+                          icon={faAddressCard}
+                        />
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {errors.fullName?.message && (
+                      <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                        {errors.fullName.message}
+                      </FieldDescription>
+                    )}
+                  </Field>
                 </div>
               </div>
               <div className="grid md:grid-cols-2 gap-2">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    {...register("email")}
-                  />
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="email"
+                      type="text"
+                      placeholder="Email"
+                      {...register("email")}
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <FontAwesomeIcon
+                        className={"text-primary"}
+                        icon={faEnvelope}
+                      />
+                    </InputGroupAddon>
+                  </InputGroup>
                   {errors.email?.message && (
-                    <p className="mt-1 text-red-500 text-xs ml-1">
-                      {errors.email?.message}
-                    </p>
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.email.message}
+                    </FieldDescription>
                   )}
-                </div>
-                <div>
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
-                  <Input
-                    id="phoneNumber"
-                    type="phoneNumber"
-                    placeholder="Enter phone number"
-                    {...register("phoneNumber")}
-                  />
+                </Field>
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="inline-start-input">
+                    Phone Number
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="phoneNumber"
+                      type="phoneNumber"
+                      placeholder="Enter phone number"
+                      {...register("phoneNumber")}
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <FontAwesomeIcon
+                        className={"text-primary"}
+                        icon={faPhone}
+                      />
+                    </InputGroupAddon>
+                  </InputGroup>
                   {errors.phoneNumber?.message && (
-                    <p className="mt-1 text-red-500 text-xs ml-1">
-                      {errors.phoneNumber?.message}
-                    </p>
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.phoneNumber.message}
+                    </FieldDescription>
                   )}
-                </div>
+                </Field>
               </div>
               <div className="grid md:grid-cols-2 gap-2">
                 <Controller
@@ -438,8 +479,8 @@ const page = () => {
           >
             Back
           </Button>
-          <Button type="submit" className="cursor-pointer">
-            Create User
+          <Button type="submit" className="cursor-pointer" disabled={isLoading}>
+            Edit User
           </Button>
         </div>
       </form>

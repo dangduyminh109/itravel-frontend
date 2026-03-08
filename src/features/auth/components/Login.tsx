@@ -7,11 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import PasswordInput from "./PasswordInput";
 import { loginSchema } from "../schemas/login.schema";
-import { set, z } from "zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -21,7 +19,15 @@ import { useRouter } from "next/navigation";
 import { useLoadingStore } from "@/store/loading.store";
 type LoginSchema = z.infer<typeof loginSchema>;
 import { useTranslations } from "next-intl";
-
+import PasswordInput from "./PasswordInput";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const Login = ({
   handleChangeFrom,
 }: {
@@ -71,18 +77,28 @@ const Login = ({
             <CardContent className="p-3">
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    {...register("email")}
-                  />
-                  {errors.email?.message && (
-                    <p className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.email.message}
-                    </p>
-                  )}
+                  <Field className="gap-1">
+                    <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="email"
+                        type="text"
+                        placeholder="Email"
+                        {...register("email")}
+                      />
+                      <InputGroupAddon align="inline-start">
+                        <FontAwesomeIcon
+                          className={"text-primary"}
+                          icon={faEnvelope}
+                        />
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {errors.email?.message && (
+                      <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                        {errors.email.message}
+                      </FieldDescription>
+                    )}
+                  </Field>
                 </div>
                 <div className="grid gap-1">
                   <div className="flex items-center">
@@ -98,6 +114,7 @@ const Login = ({
                     </Button>
                   </div>
                   <PasswordInput
+                    hasTitle={false}
                     id="password"
                     {...register("password")}
                     error={errors.password?.message}

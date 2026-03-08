@@ -8,21 +8,30 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
+
 type PasswordInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
   useFormError?: boolean;
+  hasTitle?: boolean;
 };
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   (
-    { error, className, useFormError = true, title = "Password", ...props },
+    {
+      error,
+      className,
+      useFormError = true,
+      title = "Password",
+      hasTitle = true,
+      ...props
+    },
     ref,
   ) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
       <Field className="gap-1">
-        <FieldLabel htmlFor="inline-start-input">{title}</FieldLabel>
+        {hasTitle && <FieldLabel htmlFor="inline-start-input">{title}</FieldLabel>}
         <InputGroup>
           <InputGroupInput
             ref={ref}

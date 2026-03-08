@@ -30,7 +30,13 @@ import { useRouter } from "next/dist/client/components/navigation";
 import { useEffect, useRef, useState } from "react";
 import RolePopup from "@/features/user/components/RolePopup";
 import { Badge } from "@/components/ui/badge";
-import { faUpload, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAddressCard,
+  faEnvelope,
+  faPhone,
+  faUpload,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PermissionPopup from "@/features/user/components/PermissionPopup";
 import { Role } from "@/types/role";
@@ -39,6 +45,13 @@ import { createUsers } from "@/features/user/services/user.service";
 import { CreateUserData } from "@/features/user/types/userData.type";
 import { useLoadingStore } from "@/store/loading.store";
 type CreateUserSchema = z.infer<typeof createUserSchema>;
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { FieldDescription } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 const page = () => {
   const breadcrumbData = {
@@ -50,7 +63,7 @@ const page = () => {
     ],
   };
   const router = useRouter();
-  const { setLoading } = useLoadingStore();
+  const { isLoading, setLoading } = useLoadingStore();
   const [open, setOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Set<Role>>(new Set());
   const avatarRef = useRef<HTMLInputElement>(null);
@@ -131,23 +144,30 @@ const page = () => {
             <h3 className="font-bold">Account Information</h3>
             <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
               <div>
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter username"
-                  {...register("username")}
-                />
-                {errors.username?.message && (
-                  <p className="mt-1 text-red-500 text-xs ml-1">
-                    {errors.username?.message}
-                  </p>
-                )}
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="inline-start-input">Username</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="username"
+                      type="text"
+                      placeholder="Enter username"
+                      {...register("username")}
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <FontAwesomeIcon
+                        className={"text-primary"}
+                        icon={faUser}
+                      />
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {errors.username?.message && (
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.username.message}
+                    </FieldDescription>
+                  )}
+                </Field>
               </div>
               <div className="grid gap-1">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Mật khẩu</Label>
-                </div>
                 <PasswordInput
                   id="password"
                   {...register("password")}
@@ -228,50 +248,78 @@ const page = () => {
             <h3 className="font-bold">Account Detail</h3>
             <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
               <div className="grid gap-2">
-                <div>
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Enter fullName"
-                    {...register("fullName")}
-                  />
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="inline-start-input">
+                    Full Name
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="fullName"
+                      type="text"
+                      placeholder="Full Name"
+                      {...register("fullName")}
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <FontAwesomeIcon
+                        className={"text-primary"}
+                        icon={faAddressCard}
+                      />
+                    </InputGroupAddon>
+                  </InputGroup>
                   {errors.fullName?.message && (
-                    <p className="mt-1 text-red-500 text-xs ml-1">
-                      {errors.fullName?.message}
-                    </p>
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.fullName.message}
+                    </FieldDescription>
                   )}
-                </div>
+                </Field>
               </div>
               <div className="grid md:grid-cols-2 gap-2">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    {...register("email")}
-                  />
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="email"
+                      type="text"
+                      placeholder="Email"
+                      {...register("email")}
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <FontAwesomeIcon
+                        className={"text-primary"}
+                        icon={faEnvelope}
+                      />
+                    </InputGroupAddon>
+                  </InputGroup>
                   {errors.email?.message && (
-                    <p className="mt-1 text-red-500 text-xs ml-1">
-                      {errors.email?.message}
-                    </p>
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.email.message}
+                    </FieldDescription>
                   )}
-                </div>
-                <div>
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
-                  <Input
-                    id="phoneNumber"
-                    type="phoneNumber"
-                    placeholder="Enter phone number"
-                    {...register("phoneNumber")}
-                  />
+                </Field>
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="inline-start-input">
+                    Phone Number
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="phoneNumber"
+                      type="phoneNumber"
+                      placeholder="Enter phone number"
+                      {...register("phoneNumber")}
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <FontAwesomeIcon
+                        className={"text-primary"}
+                        icon={faPhone}
+                      />
+                    </InputGroupAddon>
+                  </InputGroup>
                   {errors.phoneNumber?.message && (
-                    <p className="mt-1 text-red-500 text-xs ml-1">
-                      {errors.phoneNumber?.message}
-                    </p>
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.phoneNumber.message}
+                    </FieldDescription>
                   )}
-                </div>
+                </Field>
               </div>
               <div className="grid md:grid-cols-2 gap-2">
                 <Controller
@@ -372,7 +420,7 @@ const page = () => {
           >
             Back
           </Button>
-          <Button type="submit" className="cursor-pointer">
+          <Button type="submit" className="cursor-pointer" disabled={isLoading}>
             Create User
           </Button>
         </div>

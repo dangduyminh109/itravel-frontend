@@ -18,9 +18,7 @@ import { LoginAction } from "../actions/auth.action";
 import { useLocale } from "next-intl";
 import PasswordInput from "./PasswordInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,

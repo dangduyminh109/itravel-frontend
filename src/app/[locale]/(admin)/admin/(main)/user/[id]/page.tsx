@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAddressCard,
+  faCalendarDays,
+  faCheck,
+  faEnvelope,
+  faPhone,
+  faUser,
+  faVenusMars,
+} from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
 
 const page = async ({
@@ -52,6 +60,10 @@ const page = async ({
                   <div className="flex-1">
                     <p>Username</p>
                     <div className="shadow p-2 border rounded-md">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="px-1 mr-1 text-primary"
+                      />
                       {user.username}
                     </div>
                   </div>
@@ -164,6 +176,10 @@ const page = async ({
                   <div className="flex flex-col">
                     <p>Full Name</p>
                     <div className="shadow p-2 border rounded-md flex-1">
+                      <FontAwesomeIcon
+                        className="px-1 mr-1 text-primary"
+                        icon={faAddressCard}
+                      />
                       {user.fullName}
                     </div>
                   </div>
@@ -172,12 +188,20 @@ const page = async ({
                   <div className="flex flex-col">
                     <p>Email</p>
                     <div className="shadow p-2 border rounded-md flex-1">
+                      <FontAwesomeIcon
+                        icon={faEnvelope}
+                        className="px-1 mr-1 text-primary"
+                      />
                       {user.email || "N/A"}
                     </div>
                   </div>
                   <div className="flex flex-col">
                     <p>Phone Number</p>
                     <div className="shadow p-2 border rounded-md flex-1">
+                      <FontAwesomeIcon
+                        icon={faPhone}
+                        className="px-1 mr-1 text-primary"
+                      />
                       {user.phoneNumber || "N/A"}
                     </div>
                   </div>
@@ -186,12 +210,20 @@ const page = async ({
                   <div className="flex flex-col">
                     <p>Date of Birth</p>
                     <div className="shadow p-2 border rounded-md flex-1">
+                      <FontAwesomeIcon
+                        icon={faCalendarDays}
+                        className="px-1 mr-1 text-primary"
+                      />
                       {user.dateOfBirth || "N/A"}
                     </div>
                   </div>
                   <div className="flex flex-col">
                     <p>Gender</p>
                     <div className="shadow p-2 border rounded-md flex-1">
+                      <FontAwesomeIcon
+                        icon={faVenusMars}
+                        className="px-1 mr-1 text-primary"
+                      />
                       {user.gender || "N/A"}
                     </div>
                   </div>

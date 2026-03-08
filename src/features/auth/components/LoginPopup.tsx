@@ -47,7 +47,7 @@ export default function LoginPopup() {
       type="button"
       onClick={handleGoogleLogin}
     >
-      <FontAwesomeIcon icon={faGoogle} className="w-5 h-5" />
+      <FontAwesomeIcon icon={faGoogle} className="w-5 h-5 text-primary" />
       Đăng nhập với Google
     </Button>
   );

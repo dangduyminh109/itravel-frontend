@@ -7,9 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import PasswordInput from "./PasswordInput";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +15,19 @@ import { toast } from "sonner";
 import { registerAction, sendOtpAction } from "../actions/auth.action";
 import useOtpCooldown from "@/hooks/useOtpCooldown";
 import { useLoadingStore } from "@/store/loading.store";
-
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faAddressCard,
+  faEnvelope,
+  faShield,
+} from "@fortawesome/free-solid-svg-icons";
+import PasswordInput from "./PasswordInput";
 type RegisterSchema = z.infer<typeof registerSchema>;
 
 const Register = ({
@@ -76,11 +85,8 @@ const Register = ({
 
   return (
     <>
-      <div className="flex-1 flex p-3 items-center">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="w-full h-full overflow-auto flex items-center"
-        >
+      <div className="flex-1 p-3 items-center w-full h-full overflow-auto">
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Card className="w-full border-none shadow-none ">
             <CardHeader className="px-3 py-1">
               <CardTitle className="text-center font-bold text-2xl">
@@ -90,35 +96,54 @@ const Register = ({
             <CardContent className="p-3">
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1">
-                  <Label htmlFor="fullName">Họ tên</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Họ và tên đầy đủ"
-                    {...register("fullName")}
-                  />
-                  {errors.fullName?.message && (
-                    <p className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.fullName.message}
-                    </p>
-                  )}
+                  <Field className="gap-1">
+                    <FieldLabel htmlFor="inline-start-input">Họ tên</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="fullName"
+                        type="text"
+                        placeholder="Full Name"
+                        {...register("fullName")}
+                      />
+                      <InputGroupAddon align="inline-start">
+                        <FontAwesomeIcon
+                          className={"text-primary"}
+                          icon={faAddressCard}
+                        />
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {errors.fullName?.message && (
+                      <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                        {errors.fullName.message}
+                      </FieldDescription>
+                    )}
+                  </Field>
                 </div>
                 <div className="grid gap-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="email@example.com"
-                    {...register("email")}
-                  />
-                  {errors.email?.message && (
-                    <p className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.email.message}
-                    </p>
-                  )}
+                  <Field className="gap-1">
+                    <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="email"
+                        type="text"
+                        placeholder="Email"
+                        {...register("email")}
+                      />
+                      <InputGroupAddon align="inline-start">
+                        <FontAwesomeIcon
+                          className={"text-primary"}
+                          icon={faEnvelope}
+                        />
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {errors.email?.message && (
+                      <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                        {errors.email.message}
+                      </FieldDescription>
+                    )}
+                  </Field>
                 </div>
                 <div className="grid gap-1">
-                  <Label htmlFor="password">Mật khẩu</Label>
                   <PasswordInput
                     id="password"
                     {...register("password")}
@@ -126,9 +151,9 @@ const Register = ({
                   />
                 </div>
                 <div className="grid gap-1">
-                  <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
                   <PasswordInput
                     id="confirmPassword"
+                    title="Xác nhận mật khẩu"
                     {...register("confirmPassword")}
                     error={errors.confirmPassword?.message}
                   />
@@ -136,13 +161,25 @@ const Register = ({
                 <div>
                   <div className="flex gap-2 items-end">
                     <div className="grid gap-1 flex-1">
-                      <Label htmlFor="otp">Mã xác nhận</Label>
-                      <Input
-                        id="otp"
-                        type="text"
-                        placeholder="Nhập mã xác nhận"
-                        {...register("otp")}
-                      />
+                      <Field className="gap-1">
+                        <FieldLabel htmlFor="inline-start-input">
+                          Mã xác nhận
+                        </FieldLabel>
+                        <InputGroup>
+                          <InputGroupInput
+                            id="otp"
+                            type="text"
+                            placeholder="Nhập mã xác nhận"
+                            {...register("otp")}
+                          />
+                          <InputGroupAddon align="inline-start">
+                            <FontAwesomeIcon
+                              className={"text-primary"}
+                              icon={faShield}
+                            />
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </Field>
                     </div>
                     <Button
                       onClick={handleSendOtp}
