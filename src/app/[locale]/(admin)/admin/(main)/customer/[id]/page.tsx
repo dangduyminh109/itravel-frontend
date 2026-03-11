@@ -1,9 +1,8 @@
 import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { Badge } from "@/components/ui/badge";
-import { getUser } from "@/features/user/services/user.service";
+import { getCustomer } from "@/features/customer/services/customer.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "@/i18n/navigation";
-import { getPermissions } from "@/features/user/services/permission.service";
 import { DialogHeader } from "@/components/ui/dialog";
 import {
   Dialog,
@@ -23,6 +22,7 @@ import {
   faVenusMars,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
+import { getPermissions } from "@/features/user/services/permission.service";
 
 const page = async ({
   params,
@@ -31,31 +31,29 @@ const page = async ({
 }) => {
   const { id } = await params;
   const breadcrumbData = {
-    title: "User detail",
+    title: "Customer detail",
     listBreadcrumb: [
       { name: "Dashboard", href: "/admin/dashboard" },
-      { name: "User", href: "/admin/user" },
-      { name: "User detail", href: `/admin/user/${id}` },
+      { name: "Customer", href: "/admin/customer" },
+      { name: "Customer detail", href: `/admin/customer/${id}` },
     ],
   };
-
-  let user = null;
+  let customer = null;
   let permissionList: string[] = [];
   let permissionResult = null;
-
-  const result = await getUser(id);
-
-  if (!result.success) {
-    user = result.response;
-    permissionList = [...user.roleList].flatMap((role) => role.permissionList);
+  const result = await getCustomer(id);
+  if (result.success) {
+    customer = result.response;
+    permissionList = [...customer.roleList].flatMap(
+      (role) => role.permissionList,
+    );
     permissionResult = await getPermissions();
   }
-
   return (
     <div className="w-full">
       <CustomBreadcrumb {...breadcrumbData} />
       {!result.success ? (
-        <div>{result.message || "User not found"}</div>
+        <div>{result.message || "Customer not found"}</div>
       ) : (
         <div className="mt-2">
           <div className="grid grid-cols-5 w-full gap-2 rounded-md p-2">
@@ -64,13 +62,13 @@ const page = async ({
               <div className="flex-1 flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <p>Username</p>
+                    <p>Full name</p>
                     <div className="shadow p-2 border rounded-md">
                       <FontAwesomeIcon
                         icon={faUser}
                         className="px-1 mr-1 text-primary"
                       />
-                      {user?.username}
+                      {customer?.fullName}
                     </div>
                   </div>
                   <div>
@@ -78,12 +76,12 @@ const page = async ({
                     <div className="shadow p-2 border rounded-md">
                       <Badge
                         className={
-                          user?.status === "ACTIVE"
+                          customer?.status === "ACTIVE"
                             ? "bg-[var(--success)] hover:bg-[var(--success)]"
                             : "bg-[var(--error)] hover:bg-[var(--error)]"
                         }
                       >
-                        {user?.status}
+                        {customer?.status}
                       </Badge>
                     </div>
                   </div>
@@ -103,44 +101,20 @@ const page = async ({
                             <DialogTitle>Permission List</DialogTitle>
                           </DialogHeader>
                           <div>
-                            {permissionResult &&
-                              user &&
-                              permissionResult.success &&
+                            {permissionResult?.success &&
                               permissionResult.response.map((permission) => {
                                 return (
                                   <p>
                                     {permission.description}
                                     {/* kiểm tra per có trong role */}
-                                    {(permissionList.some(
+                                    {permissionList.some(
                                       (p) => p === permission.code,
-                                    ) ||
-                                      [...user.permissionOverrides].some(
-                                        (o) => {
-                                          {
-                                            /* kiểm tra per không có trong role nhưng extended */
-                                          }
-                                          return (
-                                            o.permission === permission.code &&
-                                            o.permissionType === "GRANT"
-                                          );
-                                        },
-                                      )) &&
-                                      ![...user.permissionOverrides].some(
-                                        (o) => {
-                                          {
-                                            /* kiểm tra per có trong role nhưng bị deny */
-                                          }
-                                          return (
-                                            o.permission === permission.code &&
-                                            o.permissionType === "DENY"
-                                          );
-                                        },
-                                      ) && (
-                                        <FontAwesomeIcon
-                                          icon={faCheck}
-                                          className="ml-2 text-[var(--success)]"
-                                        />
-                                      )}
+                                    ) && (
+                                      <FontAwesomeIcon
+                                        icon={faCheck}
+                                        className="ml-2 text-[var(--success)]"
+                                      />
+                                    )}
                                   </p>
                                 );
                               })}
@@ -150,8 +124,8 @@ const page = async ({
                     </div>
                   </div>
                   <div className="shadow p-2 border rounded-md flex gap-2">
-                    {user &&
-                      [...user?.roleList].map((role) => {
+                    {customer &&
+                      [...customer.roleList].map((role) => {
                         return <Badge key={role.name}>{role.name}</Badge>;
                       })}
                   </div>
@@ -166,12 +140,12 @@ const page = async ({
               >
                 <Avatar className="h-40 w-40">
                   <AvatarImage
-                    src={user?.avatar}
+                    src={customer?.avatar}
                     alt="avatar"
                     className="object-cover"
                   />
                   <AvatarFallback>
-                    {user?.username.slice(0, 2).toUpperCase()}
+                    {customer?.fullName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </div>
@@ -187,7 +161,7 @@ const page = async ({
                         className="px-1 mr-1 text-primary"
                         icon={faAddressCard}
                       />
-                      {user?.fullName}
+                      {customer?.fullName}
                     </div>
                   </div>
                 </div>
@@ -199,7 +173,7 @@ const page = async ({
                         icon={faEnvelope}
                         className="px-1 mr-1 text-primary"
                       />
-                      {user?.email || "N/A"}
+                      {customer?.email || "N/A"}
                     </div>
                   </div>
                   <div className="flex flex-col">
@@ -209,7 +183,7 @@ const page = async ({
                         icon={faPhone}
                         className="px-1 mr-1 text-primary"
                       />
-                      {user?.phoneNumber || "N/A"}
+                      {customer?.phoneNumber || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -221,7 +195,7 @@ const page = async ({
                         icon={faCalendarDays}
                         className="px-1 mr-1 text-primary"
                       />
-                      {user?.dateOfBirth || "N/A"}
+                      {customer?.dateOfBirth || "N/A"}
                     </div>
                   </div>
                   <div className="flex flex-col">
@@ -231,7 +205,7 @@ const page = async ({
                         icon={faVenusMars}
                         className="px-1 mr-1 text-primary"
                       />
-                      {user?.gender || "N/A"}
+                      {customer?.gender || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -239,9 +213,10 @@ const page = async ({
                   <div className="flex flex-col">
                     <p>Created At</p>
                     <div className="shadow p-2 border rounded-md flex-1">
-                      {(user &&
+                      {(customer &&
+                        customer.createdAt &&
                         formatDate({
-                          dateString: user?.createdAt,
+                          dateString: customer.createdAt,
                           type: "datetime",
                         })) ||
                         "N/A"}
@@ -250,9 +225,9 @@ const page = async ({
                   <div className="flex flex-col">
                     <p>Updated At</p>
                     <div className="shadow p-2 border rounded-md flex-1">
-                      {(user?.updatedAt &&
+                      {(customer?.updatedAt &&
                         formatDate({
-                          dateString: user?.updatedAt,
+                          dateString: customer?.updatedAt,
                           type: "datetime",
                         })) ||
                         "N/A"}
@@ -261,9 +236,9 @@ const page = async ({
                   <div className="flex flex-col">
                     <p>Deleted At</p>
                     <div className="shadow p-2 border rounded-md flex-1">
-                      {(user?.deletedAt &&
+                      {(customer?.deletedAt &&
                         formatDate({
-                          dateString: user?.deletedAt,
+                          dateString: customer?.deletedAt,
                           type: "datetime",
                         })) ||
                         "N/A"}
@@ -277,15 +252,15 @@ const page = async ({
             <Link
               className="cursor-pointer bg-background border text-sm
               rounded-md px-3 py-1 hover:bg-accent"
-              href="/admin/user"
+              href="/admin/customer"
             >
               Back
             </Link>
             <Link
               className="cursor-pointer bg-primary text-background rounded-md px-3 py-1"
-              href="/admin/user/create"
+              href="/admin/customer/create"
             >
-              Create User
+              Create Customer
             </Link>
           </div>
         </div>

@@ -307,7 +307,7 @@ const page = () => {
               <div className="grid gap-2">
                 <div>
                   <Field>
-                    <FieldLabel htmlFor="inline-start-input">
+                    <FieldLabel htmlFor="fullName">
                       Full Name
                     </FieldLabel>
                     <InputGroup>
@@ -334,7 +334,7 @@ const page = () => {
               </div>
               <div className="grid md:grid-cols-2 gap-2">
                 <Field className="gap-1">
-                  <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       id="email"
@@ -356,7 +356,7 @@ const page = () => {
                   )}
                 </Field>
                 <Field className="gap-1">
-                  <FieldLabel htmlFor="inline-start-input">
+                  <FieldLabel htmlFor="phoneNumber">
                     Phone Number
                   </FieldLabel>
                   <InputGroup>

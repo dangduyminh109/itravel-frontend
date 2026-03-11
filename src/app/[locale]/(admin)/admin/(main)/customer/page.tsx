@@ -1,12 +1,6 @@
 "use client";
 import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
-import { columns } from "@/features/user/components/table/Column";
 import { DataTable } from "@/components/shared/table/DataTable";
-import {
-  deleteUser,
-  getUsers,
-  restoreUser,
-} from "@/features/user/services/user.service";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -15,13 +9,19 @@ import { useLocale } from "next-intl";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRef, useState } from "react";
+import { columns } from "@/features/customer/components/table/Column";
+import {
+  deleteCustomer,
+  getCustomers,
+  restoreCustomer,
+} from "@/features/customer/services/customer.service";
 
 const page = () => {
   const breadcrumbData = {
-    title: "User Management",
+    title: "Customer Management",
     listBreadcrumb: [
       { name: "Dashboard", href: "/admin/dashboard" },
-      { name: "User", href: "/admin/user" },
+      { name: "Customer", href: "/admin/customer" },
     ],
   };
   const router = useRouter();
@@ -42,7 +42,7 @@ const page = () => {
           <Field orientation="horizontal">
             <Input
               type="search"
-              placeholder="Enter username, email, or phone..."
+              placeholder="Enter customername, email, or phone..."
               ref={searchRef}
               className="w-full"
             />
@@ -51,19 +51,19 @@ const page = () => {
             </Button>
           </Field>
         </form>
-        <Button onClick={() => router.push(`/${locale}/admin/user/create`)}>
+        <Button onClick={() => router.push(`/${locale}/admin/customer/create`)}>
           <FontAwesomeIcon icon={faPlus} />
-          New User
+          New Customer
         </Button>
       </div>
       <div className="mt-2">
         <DataTable
-          objPath="user"
+          objPath="customer"
           columns={columns}
-          getData={getUsers}
+          getData={getCustomers}
           hasTrash={true}
-          deleteAction={deleteUser}
-          restoreAction={restoreUser}
+          deleteAction={deleteCustomer}
+          restoreAction={restoreCustomer}
           searchKeyword={searchKeyword}
         />
       </div>

@@ -5,7 +5,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronRightIcon, FileIcon, FolderIcon } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebar.store";
 import fileTree, { SidebarItem } from "./components/collapsibleSidebarTree";
 import { useRouter } from "next/dist/client/components/navigation";

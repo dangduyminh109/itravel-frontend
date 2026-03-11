@@ -1,3 +1,5 @@
+import { Role } from "@/types/role";
+
 export interface Customer {
   id: string;
   fullName: string;
@@ -9,7 +11,11 @@ export interface Customer {
   identityCard: IdentityCard;
   passport: Passport;
   email: string;
-  roleList: number[];
+  roleList: Role[];
+  status: "ACTIVE" | "INACTIVE";
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 }
 
 export interface Address {

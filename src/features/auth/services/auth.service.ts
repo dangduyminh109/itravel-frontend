@@ -5,7 +5,7 @@ import {
   LogoutData,
   RegisterData,
 } from "../types/AuthData.type";
-import { Customer } from "@/types/customer.type";
+import { Customer } from "@/features/customer/types/customer.type";
 import { LoginResponse } from "../types/auth.type";
 
 export async function googleLogin(idToken: string) {

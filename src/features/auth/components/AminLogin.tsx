@@ -74,7 +74,7 @@ const AdminLogin = () => {
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1">
                   <Field className="gap-1">
-                    <FieldLabel htmlFor="inline-start-input">
+                    <FieldLabel htmlFor="username">
                       Tên đăng nhập
                     </FieldLabel>
                     <InputGroup>

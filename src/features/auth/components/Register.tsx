@@ -97,7 +97,7 @@ const Register = ({
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1">
                   <Field className="gap-1">
-                    <FieldLabel htmlFor="inline-start-input">Họ tên</FieldLabel>
+                    <FieldLabel htmlFor="fullName">Họ tên</FieldLabel>
                     <InputGroup>
                       <InputGroupInput
                         id="fullName"
@@ -121,7 +121,7 @@ const Register = ({
                 </div>
                 <div className="grid gap-1">
                   <Field className="gap-1">
-                    <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
                     <InputGroup>
                       <InputGroupInput
                         id="email"
@@ -162,7 +162,7 @@ const Register = ({
                   <div className="flex gap-2 items-end">
                     <div className="grid gap-1 flex-1">
                       <Field className="gap-1">
-                        <FieldLabel htmlFor="inline-start-input">
+                        <FieldLabel htmlFor="otp">
                           Mã xác nhận
                         </FieldLabel>
                         <InputGroup>

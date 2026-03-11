@@ -20,6 +20,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     {
       error,
       className,
+      id,
       useFormError = true,
       title = "Password",
       hasTitle = true,
@@ -31,9 +32,10 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 
     return (
       <Field className="gap-1">
-        {hasTitle && <FieldLabel htmlFor="inline-start-input">{title}</FieldLabel>}
+        {hasTitle && <FieldLabel htmlFor={id || "password-input"}>{title}</FieldLabel>}
         <InputGroup>
           <InputGroupInput
+            id={id || "password-input"}
             ref={ref}
             type={showPassword ? "text" : "password"}
             className={`${className ?? ""}`}

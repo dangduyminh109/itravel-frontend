@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import ConfirmPopup, {
   ConfirmData,
-} from "@/features/user/components/ConfirmPopup";
+} from "@/components/shared/popup/ConfirmPopup";
 import { useLoadingStore } from "@/store/loading.store";
 
 interface DataTableProps<TData, TValue> {
@@ -52,6 +52,7 @@ interface DataTableProps<TData, TValue> {
   getData: (args: any) => Promise<ApiResponse<PagingResponse<TData[]>>>;
   hasTrash?: boolean;
   searchKeyword?: string;
+  objPath: string;
   deleteAction?: (id: string, destroy?: boolean) => Promise<ApiResponse<null>>;
   restoreAction?: (id: string) => Promise<ApiResponse<null>>;
 }
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue>({
   deleteAction,
   restoreAction,
   getData,
+  objPath,
   searchKeyword = "",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -124,7 +126,7 @@ export function DataTable<TData, TValue>({
   });
 
   async function handleDelete({ row }: { row: any }) {
-    const user = row.original as any;
+    const obj = row.original as any;
     setLoading(true);
     setConfirmData({
       openPopup: false,
@@ -133,7 +135,7 @@ export function DataTable<TData, TValue>({
       handler: () => {},
     });
     if (deleteAction) {
-      const result = await deleteAction(user.id, trash);
+      const result = await deleteAction(obj.id, trash);
       if (result.success) {
         toast.success(
           result.message || trash
@@ -157,7 +159,7 @@ export function DataTable<TData, TValue>({
   }
 
   async function handleRestore({ row }: { row: any }) {
-    const user = row.original as any;
+    const obj = row.original as any;
     setLoading(true);
     setConfirmData({
       openPopup: false,
@@ -166,7 +168,7 @@ export function DataTable<TData, TValue>({
       handler: () => {},
     });
     if (restoreAction) {
-      const result = await restoreAction(user.id);
+      const result = await restoreAction(obj.id);
       if (result.success) {
         toast.success(result.message || "Restored successfully");
         const res = await getData({
@@ -186,13 +188,13 @@ export function DataTable<TData, TValue>({
   }
 
   function handleToggleDetail({ row }: { row: any }) {
-    const user = row.original as any;
-    router.push(`/admin/user/${user.id}`);
+    const obj = row.original as any;
+    router.push(`/admin/${objPath}/${obj.id}`);
   }
 
   function handleToggleEdit({ row }: { row: any }) {
-    const user = row.original as any;
-    router.push(`/admin/user/${user.id}/edit`);
+    const obj = row.original as any;
+    router.push(`/admin/${objPath}/${obj.id}/edit`);
   }
 
   async function handleRefresh() {
