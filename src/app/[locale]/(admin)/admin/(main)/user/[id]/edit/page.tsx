@@ -307,9 +307,7 @@ const page = () => {
               <div className="grid gap-2">
                 <div>
                   <Field>
-                    <FieldLabel htmlFor="fullName">
-                      Full Name
-                    </FieldLabel>
+                    <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
                     <InputGroup>
                       <InputGroupInput
                         id="fullName"
@@ -356,9 +354,7 @@ const page = () => {
                   )}
                 </Field>
                 <Field className="gap-1">
-                  <FieldLabel htmlFor="phoneNumber">
-                    Phone Number
-                  </FieldLabel>
+                  <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       id="phoneNumber"
@@ -480,7 +476,7 @@ const page = () => {
             Back
           </Button>
           <Button type="submit" className="cursor-pointer" disabled={isLoading}>
-            Edit User
+            Update User
           </Button>
         </div>
       </form>

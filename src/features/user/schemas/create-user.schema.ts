@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 import { z } from "zod";
 
 export const createUserSchema = z.object({
@@ -19,15 +23,20 @@ export const createUserSchema = z.object({
 
   dateOfBirth: z
     .string()
+    .optional()
+    .or(z.literal(""))
     .refine(
       (value) => {
-        const dateValue = new Date(value);
-        const now = new Date();
-        return dateValue <= now;
+        if (!value) return true;
+
+        const dateValue = dayjs(value, "DD/MM/YYYY", true);
+
+        return dateValue.isValid() && !dateValue.isAfter(dayjs(), "day");
       },
-      { message: "Ngày sinh phải là ngày trong quá khứ hoặc ngày hiện tại" },
-    )
-    .optional(),
+      {
+        message: "Ngày sinh phải là ngày trong quá khứ hoặc ngày hiện tại",
+      },
+    ),
 
   email: z
     .string()

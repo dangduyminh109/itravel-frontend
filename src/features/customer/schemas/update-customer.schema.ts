@@ -4,12 +4,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 import { z } from "zod";
 
-export const createCustomerSchema = z.object({
-  email: z
-    .string()
-    .email({ message: "Email không hợp lệ" })
-    .min(1, { message: "Email không được để trống" }),
-
+export const updateCustomerSchema = z.object({
   fullName: z.string().min(1, { message: "Họ tên không được để trống" }),
 
   phoneNumber: z
@@ -26,9 +21,14 @@ export const createCustomerSchema = z.object({
     .optional()
     .or(z.literal("")),
 
+  status: z.string().regex(/^(ACTIVE|INACTIVE)$/, {
+    message: "Trạng thái không hợp lệ",
+  }),
+
   dateOfBirth: z
     .string()
     .optional()
+    .or(z.literal(""))
     .refine(
       (value) => {
         if (!value) return true;
@@ -204,7 +204,7 @@ export const createCustomerSchema = z.object({
       }
     }),
 
-  password: z
+  newPassword: z
     .string()
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
@@ -212,5 +212,7 @@ export const createCustomerSchema = z.object({
         message:
           "Mật khẩu phải có ít nhất 8 ký tự, bao gồm ít nhất 1 chữ in hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (@$!%*?&).",
       },
-    ),
+    )
+    .optional()
+    .or(z.literal("")),
 });

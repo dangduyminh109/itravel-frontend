@@ -10,7 +10,6 @@ export async function fetchProvinces(): Promise<ApiResponse<Province[]>> {
 }
 
 export async function fetchWards(code: number): Promise<ApiResponse<Ward[]>> {
-  console.log("code", code);
   const response = await fetch(`/api/address/ward/${code}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },

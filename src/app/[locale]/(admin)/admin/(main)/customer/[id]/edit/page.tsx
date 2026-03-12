@@ -1,12 +1,19 @@
 "use client";
-import * as React from "react";
 import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
-import { Input } from "@/components/ui/input";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  getCustomer,
+  updateCustomer,
+} from "@/features/customer/services/customer.service";
+import {
+  faAddressCard,
+  faIdCard,
+  faLocationDot,
+  faPassport,
+  faPhone,
+  faUpload,
+  faUser,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   Popover,
   PopoverContent,
@@ -21,16 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  faAddressCard,
-  faEnvelope,
-  faIdCard,
-  faLocationDot,
-  faPassport,
-  faPhone,
-  faUpload,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
-import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -39,35 +36,42 @@ import {
   fetchProvinces,
   fetchWards,
 } from "@/features/auth/services/address.service";
-import { toast } from "sonner";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDate } from "@/lib/utils";
-import PasswordInput from "@/features/auth/components/PasswordInput";
-import { useRouter } from "next/dist/client/components/navigation";
+import { Controller, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Role } from "@/types/role";
 import { useLoadingStore } from "@/store/loading.store";
-import { FieldDescription } from "@/components/ui/field";
-import { createCustomerSchema } from "@/features/customer/schemas/create-customer.schema";
+import PasswordInput from "@/features/auth/components/PasswordInput";
+import { Button } from "@/components/ui/button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Input } from "@/components/ui/input";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Calendar } from "@/components/ui/calendar";
+import { formatDate } from "@/lib/utils";
+import { useParams, useRouter } from "next/dist/client/components/navigation";
+import { Customer } from "@/features/customer/types/customer.type";
+import { Role } from "@/types/role";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { UpdateCustomerData } from "@/features/customer/types/customerData.type";
+import { updateCustomerSchema } from "@/features/customer/schemas/update-customer.schema";
 import { Textarea } from "@/components/ui/textarea";
 import { Province, Ward } from "@/types/address";
 import ApiResponse from "@/types/ApiResponse.type";
 import { Spinner } from "@/components/ui/spinner";
-import { CreateCustomerData } from "@/features/customer/types/customerData.type";
-import { createCustomer } from "@/features/customer/services/customer.service";
-type createCustomerSchema = z.infer<typeof createCustomerSchema>;
+type updateCustomerSchema = z.infer<typeof updateCustomerSchema>;
 
 const page = () => {
+  const { id } = useParams<{ id: string }>();
   const breadcrumbData = {
-    title: "Create Customer",
+    title: "Edit Customer",
     listBreadcrumb: [
       { name: "Dashboard", href: "/admin/dashboard" },
       { name: "Customer", href: "/admin/customer" },
-      { name: "Create Customer", href: "/admin/customer/create" },
+      { name: "Edit Customer", href: `/admin/customer/${id}/edit` },
     ],
   };
+
   const router = useRouter();
   const { isLoading, setLoading } = useLoadingStore();
   const [open, setOpen] = useState({
@@ -76,6 +80,7 @@ const page = () => {
     passportExpiryDate: false,
     identityCardIssueDate: false,
   });
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [selectedRole, setSelectedRole] = useState<Set<Role>>(new Set());
   const avatarRef = useRef<HTMLInputElement>(null);
   const [avartarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -86,14 +91,91 @@ const page = () => {
     register,
     handleSubmit,
     control,
+    setValue,
     watch,
     formState: { errors },
-  } = useForm<createCustomerSchema>({
-    resolver: zodResolver(createCustomerSchema),
+  } = useForm<updateCustomerSchema>({
+    resolver: zodResolver(updateCustomerSchema),
     defaultValues: {
       gender: "MALE",
+      status: "ACTIVE",
     },
   });
+
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      const result = await getCustomer(id);
+      if (result.success) {
+        const customerData = result.response;
+
+        setCustomer(customerData);
+        setValue("fullName", customerData.fullName);
+        setValue("phoneNumber", customerData.phoneNumber || "");
+        setValue("gender", customerData.gender || "");
+        setValue("status", customerData.status || "");
+        setSelectedRole(
+          customerData.roleList ? new Set(customerData.roleList) : new Set(),
+        );
+        setValue(
+          "dateOfBirth",
+          customerData.dateOfBirth ? customerData.dateOfBirth : undefined,
+        );
+        if (customerData.address) {
+          if (customerData.address.detail) {
+            setValue("address.detail", customerData.address.detail);
+          }
+          if (customerData.address.provinceId) {
+            setValue(
+              "address.provinceId",
+              String(customerData.address.provinceId),
+            );
+          }
+          if (customerData.address.wardId) {
+            setValue("address.wardId", String(customerData.address.wardId));
+          }
+        }
+        if (customerData.passport) {
+          if (customerData.passport.documentNumber) {
+            setValue(
+              "passport.documentNumber",
+              customerData.passport.documentNumber,
+            );
+          }
+          if (customerData.passport.issueDate) {
+            setValue("passport.issueDate", customerData.passport.issueDate);
+          }
+          if (customerData.passport.expiryDate) {
+            setValue("passport.expiryDate", customerData.passport.expiryDate);
+          }
+        }
+        if (customerData.identityCard) {
+          if (customerData.identityCard.documentNumber) {
+            setValue(
+              "identityCard.documentNumber",
+              customerData.identityCard.documentNumber,
+            );
+          }
+          if (customerData.identityCard.issueDate) {
+            setValue(
+              "identityCard.issueDate",
+              customerData.identityCard.issueDate,
+            );
+          }
+          if (customerData.identityCard.issuePlace) {
+            setValue(
+              "identityCard.issuePlace",
+              customerData.identityCard.issuePlace,
+            );
+          }
+        }
+        if (customerData.avatar) {
+          setAvatarUrl(customerData.avatar);
+        }
+      }
+    };
+    fetchCustomer();
+  }, [id]);
+
   const watchProvinceId = watch("address.provinceId");
 
   useEffect(() => {
@@ -122,7 +204,6 @@ const page = () => {
   useEffect(() => {
     async function loadWard() {
       setIsLoadingAddress(true);
-
       if (watchProvinceId && Number(watchProvinceId)) {
         try {
           const result: ApiResponse<Ward[]> = await fetchWards(
@@ -149,12 +230,13 @@ const page = () => {
     loadWard();
   }, [watchProvinceId]);
 
-  const onSubmit = async (data: createCustomerSchema) => {
-    const customerData: CreateCustomerData = {
+  const onSubmit = async (data: updateCustomerSchema) => {
+    const customerData: UpdateCustomerData = {
+      id: id,
       fullName: data.fullName,
-      email: data.email,
-      password: data.password,
+      newPassword: data.newPassword,
       dateOfBirth: data.dateOfBirth,
+      status: data.status,
       gender: data.gender,
       phoneNumber: data.phoneNumber,
       address: data.address,
@@ -164,11 +246,11 @@ const page = () => {
       avatar: avatarRef.current?.files?.[0] || undefined,
     };
     setLoading(true);
-    const result = await createCustomer(customerData);
+    const result = await updateCustomer(customerData);
     if (result.success) {
-      toast.success(result.message || "Create customer successfully!");
+      toast.success(result.message || "Update customer successfully!");
     } else {
-      toast.error(result.message || "Failed to create customer.");
+      toast.error(result.message || "Failed to update customer.");
     }
     setLoading(false);
   };
@@ -186,6 +268,7 @@ const page = () => {
       avatarRef.current.value = "";
     }
   }
+
   return (
     <div className="w-full">
       <CustomBreadcrumb {...breadcrumbData} />
@@ -194,38 +277,69 @@ const page = () => {
           <div className="col-span-5 md:col-span-3">
             <h3 className="font-bold">Account Information</h3>
             <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
-              <Field className="gap-1">
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <InputGroup>
-                  <InputGroupInput
-                    id="email"
-                    type="text"
-                    placeholder="Enter email"
-                    {...register("email")}
-                  />
-                  <InputGroupAddon align="inline-start">
+              <div className="grid gap-2 grid-cols-3">
+                <div className="col-span-3 md:col-span-2">
+                  <p>
+                    Email{" "}
+                    <span className="italic text-[var(--info)]">
+                      (read-only)
+                    </span>
+                  </p>
+                  <div className="shadow px-3 py-1 border rounded-md">
                     <FontAwesomeIcon
-                      className={"text-primary"}
-                      icon={faEnvelope}
+                      icon={faUser}
+                      className="mr-2 text-primary"
                     />
-                  </InputGroupAddon>
-                </InputGroup>
-                {errors.email?.message && (
-                  <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                    {errors.email.message}
-                  </FieldDescription>
-                )}
-              </Field>
+                    {customer?.email}
+                  </div>
+                </div>
+                <div className="col-span-3 md:col-span-1">
+                  <div>
+                    <Controller
+                      name="status"
+                      control={control}
+                      render={({ field }) => (
+                        <Field className="gap-1 w-full">
+                          <FieldLabel htmlFor="status">Status</FieldLabel>
+
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger id="status" className="w-full">
+                              <SelectValue placeholder="select status" />
+                            </SelectTrigger>
+
+                            <SelectContent className="bg-background">
+                              <SelectGroup>
+                                <SelectItem value="ACTIVE">Active</SelectItem>
+                                <SelectItem value="INACTIVE">
+                                  Inactive
+                                </SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          {errors.status?.message && (
+                            <p className="mt-1 text-red-500 text-xs ml-1">
+                              {errors.status?.message}
+                            </p>
+                          )}
+                        </Field>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="grid gap-1">
                 <PasswordInput
-                  id="password"
-                  {...register("password")}
-                  error={errors.password?.message}
+                  id="newPassword"
+                  {...register("newPassword")}
+                  error={errors.newPassword?.message}
                   useFormError={false}
                 />
-                {errors.password?.message && (
+                {errors.newPassword?.message && (
                   <p className="mt-1 text-red-500 text-xs ml-1">
-                    {errors.password?.message}
+                    {errors.newPassword?.message}
                   </p>
                 )}
               </div>
@@ -760,43 +874,45 @@ const page = () => {
                     <Controller
                       name="address.wardId"
                       control={control}
-                      render={({ field }) => (
-                        <Field className="gap-1 w-full">
-                          <FieldLabel htmlFor="wardId">
-                            {isLoadingAddress && <Spinner />}
-                            Ward
-                          </FieldLabel>
+                      render={({ field }) => {
+                        return (
+                          <Field className="gap-1 w-full">
+                            <FieldLabel htmlFor="wardId">
+                              {isLoadingAddress && <Spinner />}
+                              Ward
+                            </FieldLabel>
 
-                          <Select
-                            onValueChange={field.onChange}
-                            disabled={!watchProvinceId || isLoadingAddress}
-                            value={field.value}
-                          >
-                            <SelectTrigger id="wardId" className="w-full">
-                              <SelectValue placeholder="select ward" />
-                            </SelectTrigger>
+                            <Select
+                              onValueChange={field.onChange}
+                              disabled={!watchProvinceId || isLoadingAddress}
+                              value={field.value}
+                            >
+                              <SelectTrigger id="wardId" className="w-full">
+                                <SelectValue placeholder="select ward" />
+                              </SelectTrigger>
 
-                            <SelectContent className="bg-background">
-                              <SelectGroup>
-                                {wardList &&
-                                  wardList.map((ward) => (
-                                    <SelectItem
-                                      key={ward.code}
-                                      value={String(ward.code)}
-                                    >
-                                      {ward.name}
-                                    </SelectItem>
-                                  ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                          {errors.address?.wardId?.message && (
-                            <p className="mt-1 text-red-500 text-xs ml-1">
-                              {errors.address.wardId?.message}
-                            </p>
-                          )}
-                        </Field>
-                      )}
+                              <SelectContent className="bg-background">
+                                <SelectGroup>
+                                  {wardList &&
+                                    wardList.map((ward) => (
+                                      <SelectItem
+                                        key={ward.code}
+                                        value={String(ward.code)}
+                                      >
+                                        {ward.name}
+                                      </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            {errors.address?.wardId?.message && (
+                              <p className="mt-1 text-red-500 text-xs ml-1">
+                                {errors.address.wardId?.message}
+                              </p>
+                            )}
+                          </Field>
+                        );
+                      }}
                     />
                   </div>
                   <Field className="gap-1">
@@ -829,7 +945,7 @@ const page = () => {
             Back
           </Button>
           <Button type="submit" className="cursor-pointer" disabled={isLoading}>
-            Create Customer
+            Update Customer
           </Button>
         </div>
       </form>

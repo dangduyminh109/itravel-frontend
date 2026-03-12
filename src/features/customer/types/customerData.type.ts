@@ -1,17 +1,16 @@
-import { PermissionOverride } from "@/features/user/types/user.type";
-import { Address, IdentityCard, Passport } from "./customer.type";
 
 export interface CreateCustomerData {
-  fullName: string;
-  phoneNumber: string;
-  avatar: string;
-  gender: string;
-  dateOfBirth: string;
-  address: Address;
-  identityCard: IdentityCard;
-  passport: Passport;
   email: string;
-  roleList: number[];
+  fullName: string;
+  password: string;
+  phoneNumber?: string;
+  avatar?: File;
+  gender?: string;
+  dateOfBirth?: string;
+  address?: Address;
+  identityCard?: IdentityCard;
+  passport?: Passport;
+  roleList: Set<string>;
 }
 
 export interface UpdateCustomerData {
@@ -19,11 +18,31 @@ export interface UpdateCustomerData {
   fullName: string;
   status: string;
   email?: string;
-  newPassword?: string;
-  dateOfBirth?: string;
-  gender?: string;
-  phoneNumber?: string;
-  roleList: Set<string>;
-  permissionOverrides?: Set<PermissionOverride>;
   avatar?: File;
+  newPassword?: string;
+  phoneNumber?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  address?: Address;
+  identityCard?: IdentityCard;
+  passport?: Passport;
+  roleList: Set<string>;
+}
+
+interface Address {
+  detail?: string;
+  wardId?: string;
+  provinceId?: string;
+}
+
+interface IdentityCard {
+  documentNumber?: string;
+  issueDate?: string;
+  issuePlace?: string;
+}
+
+interface Passport {
+  documentNumber?: string;
+  issueDate?: string;
+  expiryDate?: string;
 }
