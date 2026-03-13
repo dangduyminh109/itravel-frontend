@@ -141,6 +141,7 @@ const page = () => {
     }
     const userData: UpdateUserData = {
       id: id,
+      removeAvatar: !avartarUrl,
       fullName: data.fullName,
       email: data.email,
       status: data.status,
@@ -408,12 +409,11 @@ const page = () => {
                             captionLayout="dropdown"
                             onSelect={(date) => {
                               if (date) {
-                                field.onChange(
-                                  formatDate({
-                                    dateString: date.toDateString(),
-                                    type: "date",
-                                  }),
-                                );
+                                if (date) {
+                                  field.onChange(
+                                    date.toISOString().slice(0, 10),
+                                  );
+                                }
                               }
                               setOpen(false);
                             }}

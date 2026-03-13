@@ -9,7 +9,7 @@ import { Link } from "@/i18n/navigation";
 const Header = () => {
   const { toggleSidebar } = useSidebarStore();
   return (
-    <header className="h-12 w-screen bg-primary fixed top-0 z-50">
+    <header className="h-12 w-screen bg-primary fixed top-0 z-100">
       <div className="w-full h-full flex justify-between py-1 px-10 items-center">
         <div className="flex items-center">
           <Link

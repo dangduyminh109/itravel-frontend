@@ -5,7 +5,6 @@ import {
   CreateCustomerData,
   UpdateCustomerData,
 } from "../types/customerData.type";
-import { object } from "zod";
 
 interface GetCustomersProps {
   deleted: boolean;
@@ -125,6 +124,8 @@ export async function updateCustomer(
   const data = new FormData();
   data.append("fullName", customerData.fullName);
   data.append("newPassword", customerData.newPassword || "");
+  data.append("removeAvatar", String(customerData.removeAvatar || false));
+  data.append("status", customerData.status);
   if (customerData.dateOfBirth) {
     data.append("dateOfBirth", customerData.dateOfBirth);
   }
@@ -147,6 +148,9 @@ export async function updateCustomer(
         "address.provinceId",
         customerData.address.provinceId.toString(),
       );
+    }
+    if (customerData.address.detail) {
+      data.append("address.detail", customerData.address.detail.toString());
     }
     if (customerData.address.wardId) {
       data.append("address.wardId", customerData.address.wardId.toString());

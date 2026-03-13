@@ -1,4 +1,3 @@
-
 export interface CreateCustomerData {
   email: string;
   fullName: string;
@@ -27,6 +26,7 @@ export interface UpdateCustomerData {
   identityCard?: IdentityCard;
   passport?: Passport;
   roleList: Set<string>;
+  removeAvatar?: boolean;
 }
 
 interface Address {

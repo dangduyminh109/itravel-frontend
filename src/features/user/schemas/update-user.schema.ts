@@ -32,7 +32,7 @@ export const updateUserSchema = z.object({
       (value) => {
         if (!value) return true;
 
-        const dateValue = dayjs(value, "DD/MM/YYYY", true);
+        const dateValue = dayjs(value, "YYYY-MM-DD", true);
 
         return dateValue.isValid() && !dateValue.isAfter(dayjs(), "day");
       },

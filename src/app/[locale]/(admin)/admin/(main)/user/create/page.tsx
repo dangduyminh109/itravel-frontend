@@ -249,9 +249,7 @@ const page = () => {
             <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
               <div className="grid gap-2">
                 <Field className="gap-1">
-                  <FieldLabel htmlFor="fullName">
-                    Full Name
-                  </FieldLabel>
+                  <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       id="fullName"
@@ -297,9 +295,7 @@ const page = () => {
                   )}
                 </Field>
                 <Field className="gap-1">
-                  <FieldLabel htmlFor="phoneNumber">
-                    Phone Number
-                  </FieldLabel>
+                  <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       id="phoneNumber"
@@ -353,12 +349,11 @@ const page = () => {
                             captionLayout="dropdown"
                             onSelect={(date) => {
                               if (date) {
-                                field.onChange(
-                                  formatDate({
-                                    dateString: date.toDateString(),
-                                    type: "date",
-                                  }),
-                                );
+                                if (date) {
+                                  field.onChange(
+                                    date.toISOString().slice(0, 10),
+                                  );
+                                }
                               }
                               setOpen(false);
                             }}

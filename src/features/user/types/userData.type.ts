@@ -25,4 +25,5 @@ export interface UpdateUserData {
   roleList: Set<string>;
   permissionOverrides?: Set<PermissionOverride>;
   avatar?: File;
+  removeAvatar?: boolean;
 }

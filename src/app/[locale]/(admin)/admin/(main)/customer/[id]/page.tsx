@@ -17,12 +17,15 @@ import {
   faCalendarDays,
   faCheck,
   faEnvelope,
+  faPassport,
   faPhone,
   faUser,
   faVenusMars,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
 import { getPermissions } from "@/features/user/services/permission.service";
+import { getProvince, getWard } from "@/features/auth/services/address.service";
+import { Province, Ward } from "@/types/address";
 
 const page = async ({
   params,
@@ -41,6 +44,9 @@ const page = async ({
   let customer = null;
   let permissionList: string[] = [];
   let permissionResult = null;
+  let province: Province | null = null;
+  let ward: Ward | null = null;
+
   const result = await getCustomer(id);
   if (result.success) {
     customer = result.response;
@@ -48,7 +54,20 @@ const page = async ({
       (role) => role.permissionList,
     );
     permissionResult = await getPermissions();
+    if (customer.address?.provinceId) {
+      const r = await getProvince(String(customer.address?.provinceId));
+      if (r.success) {
+        province = r.response;
+      }
+    }
+    if (customer.address?.wardId) {
+      const r = await getWard(String(customer.address?.wardId));
+      if (r.success) {
+        ward = r.response;
+      }
+    }
   }
+
   return (
     <div className="w-full">
       <CustomBreadcrumb {...breadcrumbData} />
@@ -242,6 +261,100 @@ const page = async ({
                           type: "datetime",
                         })) ||
                         "N/A"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-span-5">
+              <h3 className="font-bold">Customer Information</h3>
+              <div className="grid grid-cols-2  gap-3 p-2 rounded-md border-2 border-primary">
+                <div className="md:col-span-1 col-span-2">
+                  <p>Passport</p>
+                  <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
+                    <div className="grid gap-2">
+                      <div className="flex flex-col">
+                        <p>Number</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          <FontAwesomeIcon
+                            className="px-1 mr-1 text-primary"
+                            icon={faPassport}
+                          />
+                          {customer?.passport?.documentNumber || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-2">
+                      <div className="flex flex-col">
+                        <p>Issue Date</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          {customer?.passport?.issueDate || "N/A"}
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <p>Expiry Date</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          {customer?.passport?.expiryDate || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="md:col-span-1 col-span-2">
+                  <p>CMND/CCCD</p>
+                  <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
+                    <div className="grid gap-2">
+                      <div className="flex flex-col">
+                        <p>Number</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          <FontAwesomeIcon
+                            className="px-1 mr-1 text-primary"
+                            icon={faPassport}
+                          />
+                          {customer?.identityCard?.documentNumber || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-2">
+                      <div className="flex flex-col">
+                        <p>Issue Date</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          {customer?.identityCard?.issueDate || "N/A"}
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <p>Issued Place</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          {customer?.identityCard?.issuePlace || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <p>Address</p>
+                  <div className="flex flex-col gap-3 p-2 rounded-md border-2 border-primary">
+                    <div className="grid md:grid-cols-2 gap-2">
+                      <div className="flex flex-col">
+                        <p>Province</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          {province?.name || "N/A"}
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <p>Ward</p>
+                        <div className="shadow p-2 border rounded-md flex-1">
+                          {ward?.name || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <div className="flex flex-col">
+                        <p>Detail</p>
+                        <div className="shadow p-2 h-24 border rounded-md overflow-auto">
+                          {customer?.address?.detail || "N/A"}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

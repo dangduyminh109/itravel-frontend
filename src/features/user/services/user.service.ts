@@ -88,7 +88,7 @@ export async function updateUser(
   const data = new FormData();
   data.append("fullName", userData.fullName);
   data.append("status", userData.status);
-
+  data.append("removeAvatar", String(userData.removeAvatar || false));
   if (userData.email) {
     data.append("email", userData.email);
   }

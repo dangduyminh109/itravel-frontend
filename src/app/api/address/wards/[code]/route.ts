@@ -6,20 +6,19 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ code: string }> },
 ) {
-  const { code } = await params;
   try {
+    const { code } = await params;
     const result = await fetch(
-      `https://provinces.open-api.vn/api/v2/w/${code}`,
+      `https://provinces.open-api.vn/api/v2/w?province=${code}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       },
     );
-
     if (result.status === 200) {
-      const response: ApiResponse<Ward> = {
+      const response: ApiResponse<Ward[]> = {
         success: true,
-        message: "fetch ward successfully",
+        message: "fetch wards successfully",
         response: await result.json(),
         timestamp: new Date().toISOString(),
       };
@@ -27,7 +26,7 @@ export async function GET(
     } else {
       const response: ApiResponse<null> = {
         success: false,
-        message: "Failed to fetch ward",
+        message: "Failed to fetch wards",
         response: null,
         timestamp: new Date().toISOString(),
       };
@@ -36,7 +35,7 @@ export async function GET(
   } catch (error) {
     const response: ApiResponse<null> = {
       success: false,
-      message: "Failed to fetch ward",
+      message: "Failed to fetch wards",
       response: null,
       timestamp: new Date().toISOString(),
     };

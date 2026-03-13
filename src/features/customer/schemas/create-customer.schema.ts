@@ -29,11 +29,12 @@ export const createCustomerSchema = z.object({
   dateOfBirth: z
     .string()
     .optional()
+    .or(z.literal(""))
     .refine(
       (value) => {
         if (!value) return true;
 
-        const dateValue = dayjs(value, "DD/MM/YYYY", true);
+        const dateValue = dayjs(value, "YYYY-MM-DD", true);
 
         return dateValue.isValid() && !dateValue.isAfter(dayjs(), "day");
       },
@@ -142,7 +143,7 @@ export const createCustomerSchema = z.object({
 
       if (filled.length === 3) {
         const issue = new Date(issueDate!);
-        const expiry = dayjs(expiryDate!, "DD/MM/YYYY", true);
+        const expiry = dayjs(expiryDate!, "YYYY-MM-DD", true);
 
         if (issue > new Date()) {
           ctx.addIssue({

@@ -107,7 +107,6 @@ const page = () => {
       const result = await getCustomer(id);
       if (result.success) {
         const customerData = result.response;
-
         setCustomer(customerData);
         setValue("fullName", customerData.fullName);
         setValue("phoneNumber", customerData.phoneNumber || "");
@@ -179,6 +178,12 @@ const page = () => {
   const watchProvinceId = watch("address.provinceId");
 
   useEffect(() => {
+    if (!customer) return;
+
+    setValue("address.provinceId", String(customer.address?.provinceId));
+  }, [customer]);
+
+  useEffect(() => {
     async function getProvinces() {
       setIsLoadingAddress(true);
       try {
@@ -202,37 +207,42 @@ const page = () => {
   }, []);
 
   useEffect(() => {
+    const provinceId = Number(watchProvinceId);
+    if (!provinceId) return;
+
     async function loadWard() {
       setIsLoadingAddress(true);
-      if (watchProvinceId && Number(watchProvinceId)) {
-        try {
-          const result: ApiResponse<Ward[]> = await fetchWards(
-            Number(watchProvinceId),
-          );
+      try {
+        const result: ApiResponse<Ward[]> = await fetchWards(
+          Number(watchProvinceId),
+        );
 
-          if (result.success) {
-            setWardList(result.response || []);
-          } else {
-            toast.error(
-              "Failed to fetch wards! Please reload the page and try again.",
-            );
-          }
-        } catch (e) {
+        if (result.success) {
+          setWardList(result.response || []);
+        } else {
           toast.error(
             "Failed to fetch wards! Please reload the page and try again.",
           );
-        } finally {
-          setIsLoadingAddress(false);
         }
+      } catch (e) {
+        toast.error(
+          "Failed to fetch wards! Please reload the page and try again.",
+        );
+      } finally {
+        setIsLoadingAddress(false);
       }
     }
-
-    loadWard();
+    loadWard().then(() => {
+      if (customer?.address?.wardId) {
+        setValue("address.wardId", String(customer.address.wardId));
+      }
+    });
   }, [watchProvinceId]);
 
   const onSubmit = async (data: updateCustomerSchema) => {
     const customerData: UpdateCustomerData = {
       id: id,
+      removeAvatar: !avartarUrl,
       fullName: data.fullName,
       newPassword: data.newPassword,
       dateOfBirth: data.dateOfBirth,
@@ -482,12 +492,7 @@ const page = () => {
                             captionLayout="dropdown"
                             onSelect={(date) => {
                               if (date) {
-                                field.onChange(
-                                  formatDate({
-                                    dateString: date.toDateString(),
-                                    type: "date",
-                                  }),
-                                );
+                                field.onChange(date.toISOString().slice(0, 10));
                               }
                               setOpen({ ...open, dateOfBirth: false });
                             }}
@@ -611,10 +616,7 @@ const page = () => {
                                 onSelect={(date) => {
                                   if (date) {
                                     field.onChange(
-                                      formatDate({
-                                        dateString: date.toDateString(),
-                                        type: "date",
-                                      }),
+                                      date.toISOString().slice(0, 10),
                                     );
                                   }
                                   setOpen({
@@ -678,10 +680,7 @@ const page = () => {
                                 onSelect={(date) => {
                                   if (date) {
                                     field.onChange(
-                                      formatDate({
-                                        dateString: date.toDateString(),
-                                        type: "date",
-                                      }),
+                                      date.toISOString().slice(0, 10),
                                     );
                                   }
                                   setOpen({
@@ -776,10 +775,7 @@ const page = () => {
                                 onSelect={(date) => {
                                   if (date) {
                                     field.onChange(
-                                      formatDate({
-                                        dateString: date.toDateString(),
-                                        type: "date",
-                                      }),
+                                      date.toISOString().slice(0, 10),
                                     );
                                   }
                                   setOpen({
@@ -883,6 +879,7 @@ const page = () => {
                             </FieldLabel>
 
                             <Select
+                              key={watchProvinceId}
                               onValueChange={field.onChange}
                               disabled={!watchProvinceId || isLoadingAddress}
                               value={field.value}

@@ -121,9 +121,10 @@ const page = () => {
 
   useEffect(() => {
     async function loadWard() {
-      setIsLoadingAddress(true);
-
-      if (watchProvinceId && Number(watchProvinceId)) {
+        const provinceId = Number(watchProvinceId);
+        if (!provinceId) return;
+      if (provinceId) {
+        setIsLoadingAddress(true);
         try {
           const result: ApiResponse<Ward[]> = await fetchWards(
             Number(watchProvinceId),
@@ -368,12 +369,11 @@ const page = () => {
                             captionLayout="dropdown"
                             onSelect={(date) => {
                               if (date) {
-                                field.onChange(
-                                  formatDate({
-                                    dateString: date.toDateString(),
-                                    type: "date",
-                                  }),
-                                );
+                                if (date) {
+                                  field.onChange(
+                                    date.toISOString().slice(0, 10),
+                                  );
+                                }
                               }
                               setOpen({ ...open, dateOfBirth: false });
                             }}
@@ -496,12 +496,11 @@ const page = () => {
                                 captionLayout="dropdown"
                                 onSelect={(date) => {
                                   if (date) {
-                                    field.onChange(
-                                      formatDate({
-                                        dateString: date.toDateString(),
-                                        type: "date",
-                                      }),
-                                    );
+                                    if (date) {
+                                      field.onChange(
+                                        date.toISOString().slice(0, 10),
+                                      );
+                                    }
                                   }
                                   setOpen({
                                     ...open,
@@ -563,12 +562,11 @@ const page = () => {
                                 captionLayout="dropdown"
                                 onSelect={(date) => {
                                   if (date) {
-                                    field.onChange(
-                                      formatDate({
-                                        dateString: date.toDateString(),
-                                        type: "date",
-                                      }),
-                                    );
+                                    if (date) {
+                                      field.onChange(
+                                        date.toISOString().slice(0, 10),
+                                      );
+                                    }
                                   }
                                   setOpen({
                                     ...open,
@@ -661,12 +659,11 @@ const page = () => {
                                 captionLayout="dropdown"
                                 onSelect={(date) => {
                                   if (date) {
-                                    field.onChange(
-                                      formatDate({
-                                        dateString: date.toDateString(),
-                                        type: "date",
-                                      }),
-                                    );
+                                    if (date) {
+                                      field.onChange(
+                                        date.toISOString().slice(0, 10),
+                                      );
+                                    }
                                   }
                                   setOpen({
                                     ...open,

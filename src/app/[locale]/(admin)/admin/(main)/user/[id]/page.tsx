@@ -44,8 +44,7 @@ const page = async ({
   let permissionResult = null;
 
   const result = await getUser(id);
-
-  if (!result.success) {
+  if (result.success) {
     user = result.response;
     permissionList = [...user.roleList].flatMap((role) => role.permissionList);
     permissionResult = await getPermissions();
