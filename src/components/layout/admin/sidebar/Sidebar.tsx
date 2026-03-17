@@ -11,7 +11,11 @@ import fileTree, { SidebarItem } from "./components/collapsibleSidebarTree";
 import { useRouter } from "next/dist/client/components/navigation";
 import { useLocale } from "next-intl";
 
-const renderItem = (fileItem: SidebarItem) => {
+const renderItem = (
+  fileItem: SidebarItem,
+  activeItem: string,
+  setActive: (name: string) => void,
+) => {
   const router = useRouter();
   const locale = useLocale();
   if ("items" in fileItem) {
@@ -32,7 +36,7 @@ const renderItem = (fileItem: SidebarItem) => {
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-1 ml-5 style-lyra:ml-4">
           <div className="flex flex-col gap-1">
-            {fileItem.items.map((child) => renderItem(child))}
+            {fileItem.items.map((child) => renderItem(child, activeItem, setActive))}
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -42,8 +46,11 @@ const renderItem = (fileItem: SidebarItem) => {
   return (
     <Button
       key={fileItem.name}
-      onClick={() => router.push(`/${locale}/${fileItem.path}`)}
-      variant="ghost"
+      onClick={() => {
+        router.push(`/${locale}/${fileItem.path}`);
+        setActive(fileItem.name);
+      }}
+      variant={activeItem === fileItem.name ? "default" : "ghost"}
       className="w-full justify-start gap-2 text-background-foreground cursor-pointer"
     >
       {fileItem.icon && fileItem.icon}
@@ -53,8 +60,7 @@ const renderItem = (fileItem: SidebarItem) => {
 };
 
 const Sidebar = () => {
-  const { isOpen, toggleSidebar } = useSidebarStore();
-
+  const { isOpen, toggleSidebar , activeItem, setActiveItem} = useSidebarStore();
   return (
     <>
       {isOpen && (
@@ -72,7 +78,7 @@ const Sidebar = () => {
          ${isOpen ? "w-70 p-2" : "w-0 p-0"}`}
       >
         <div className="flex flex-col gap-1 py-2">
-          {fileTree.map((item) => renderItem(item))}
+          {fileTree.map((item) => renderItem(item, activeItem, setActiveItem))}
         </div>
       </aside>
     </>

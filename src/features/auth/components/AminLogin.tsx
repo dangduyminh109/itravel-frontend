@@ -26,6 +26,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useEffect } from "react";
+import { useSidebarStore } from "@/store/sidebar.store";
 type AdminLoginSchema = z.infer<typeof adminLoginSchema>;
 
 const AdminLogin = () => {
@@ -36,6 +37,7 @@ const AdminLogin = () => {
   } = useForm<AdminLoginSchema>({
     resolver: zodResolver(adminLoginSchema),
   });
+  const { setActiveItem } = useSidebarStore();
   const router = useRouter();
   const { setLoading } = useLoadingStore();
   const locale = useLocale();
@@ -47,12 +49,14 @@ const AdminLogin = () => {
     const result = await LoginAction({
       identifier: data.username,
       password: data.password,
+      isAdmin: true,
     });
     setLoading(false);
-
+    
     if (result.success) {
       toast.success(result.message || "Đăng nhập thành công!");
       router.push(`/${locale}/admin/dashboard`);
+      setActiveItem("dashboard");
     } else {
       toast.error(result.message || "Đăng nhập thất bại.");
     }
@@ -74,9 +78,7 @@ const AdminLogin = () => {
               <div className="flex flex-col gap-3">
                 <div className="grid gap-1">
                   <Field className="gap-1">
-                    <FieldLabel htmlFor="username">
-                      Tên đăng nhập
-                    </FieldLabel>
+                    <FieldLabel htmlFor="username">Tên đăng nhập</FieldLabel>
                     <InputGroup>
                       <InputGroupInput
                         id="username"

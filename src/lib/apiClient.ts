@@ -1,8 +1,7 @@
 "use server";
 import {
-  clearAuthCookies,
+  getAdminAuthCookies,
   getAuthCookies,
-  setAuthCookies,
 } from "@/features/auth/services/token.service";
 import ApiResponse from "@/types/ApiResponse.type";
 import { redirect } from "next/navigation";
@@ -14,7 +13,6 @@ interface FetchOptions extends RequestInit {
 }
 
 async function handleRedirect(isAdmin: boolean) {
-  clearAuthCookies();
   const locale = await getLocale();
   if (isAdmin) redirect(`/${locale}/admin/auth`);
   else redirect(`/${locale}/auth`);
@@ -24,11 +22,10 @@ export async function apiClient<T>(
   endpoint: string,
   options: FetchOptions = {},
   isAdmin: boolean = true,
-  isRetry = false,
 ): Promise<ApiResponse<T>> {
   const { requireAuth = true, ...fetchOptions } = options;
-  const headers: any = {};
 
+  const headers: HeadersInit = {};
   if (!(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
@@ -38,45 +35,28 @@ export async function apiClient<T>(
     },
     ...fetchOptions,
   };
+  let accessToken = null;
+  let refreshToken = null;
 
-  const { accessToken, refreshToken } = await getAuthCookies();
-  if (requireAuth) {
-    const token = accessToken;
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
-    } else {
-      if (refreshToken) {
-        const authResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            refreshToken,
-          }),
-        });
-        if (authResponse.ok) {
-          const authData = await authResponse.json();
-          await setAuthCookies(
-            authData.accessToken,
-            authData.refreshToken,
-            authData.expiresAt,
-          );
-          config.headers = {
-            ...config.headers,
-            Authorization: `Bearer ${authData.accessToken}`,
-          };
-        } else {
-          await handleRedirect(isAdmin);
-        }
-      } else {
-        await handleRedirect(isAdmin);
-      }
-    }
+  if (isAdmin) {
+    const token = await getAdminAuthCookies();
+    accessToken = token.accessToken;
+    refreshToken = token.refreshToken;
+  } else {
+    const token = await getAuthCookies();
+    accessToken = token.accessToken;
+    refreshToken = token.refreshToken;
   }
+
+  if (requireAuth && accessToken) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+  } else if (requireAuth && !accessToken) {
+    await handleRedirect(isAdmin);
+  }
+
   const response = await fetch(`${BASE_API_URL}${endpoint}`, config);
   if (response.status === 204) {
     return {
@@ -88,32 +68,9 @@ export async function apiClient<T>(
   }
 
   const res: ApiResponse<T> = await response.json();
-  if (!response.ok && response.status === 401 && requireAuth && !isRetry) {
-    if (refreshToken) {
-      const authResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          refreshToken,
-        }),
-      });
-      if (authResponse.ok) {
-        const authData = await authResponse.json();
-        await setAuthCookies(
-          authData.response.accessToken,
-          authData.response.refreshToken,
-          authData.response.expiresAt,
-        );
 
-        return apiClient<T>(endpoint, options, isAdmin, true);
-      } else {
-        await handleRedirect(isAdmin);
-      }
-    } else {
-      await handleRedirect(isAdmin);
-    }
+  if (!response.ok && response.status === 401 && requireAuth) {
+    await handleRedirect(isAdmin);
   }
   return res;
 }

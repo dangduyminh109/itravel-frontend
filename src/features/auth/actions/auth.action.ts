@@ -8,8 +8,9 @@ import {
   sendOtp,
 } from "../services/auth.service";
 import {
-  clearAuthCookies,
-  getAuthCookies,
+  clearAdminAuthCookies,
+  getAdminAuthCookies,
+  setAdminAuthCookies,
   setAuthCookies,
 } from "../services/token.service";
 
@@ -32,11 +33,17 @@ export async function registerAction(data: RegisterData) {
 export async function LoginAction(data: LoginData) {
   const result = await login(data);
   if (result.success) {
-    setAuthCookies(
-      result.response.accessToken,
-      result.response.refreshToken,
-      result.response.expiresAt,
-    );
+    if (data.isAdmin) {
+      await setAdminAuthCookies(
+        result.response.accessToken,
+        result.response.refreshToken,
+      );
+    } else {
+      await setAuthCookies(
+        result.response.accessToken,
+        result.response.refreshToken,
+      );
+    }
   }
   return result;
 }
@@ -47,11 +54,11 @@ export async function ForgotPasswordAction(data: ForgotPasswordData) {
 }
 
 export async function AdminLogoutAction(locale: string) {
-  const { refreshToken } = await getAuthCookies();
+  const { refreshToken } = await getAdminAuthCookies();
   if (refreshToken) {
     await logout({ refreshToken });
   }
-  clearAuthCookies();
+  clearAdminAuthCookies();
 
   redirect(`/${locale}/admin/auth`);
 }

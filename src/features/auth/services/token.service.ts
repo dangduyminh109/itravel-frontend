@@ -12,7 +12,6 @@ export async function getAuthCookies() {
 export async function setAuthCookies(
   accessToken: string,
   refreshToken: string,
-  expiresAt: string,
 ) {
   const cookieStore = await cookies();
   cookieStore.set({
@@ -30,19 +29,46 @@ export async function setAuthCookies(
     secure: process.env.NODE_ENV === "production",
     maxAge: parseInt(process.env.NEXT_PUBLIC_REFRESHABLE_DURATION || "604800"),
   });
-
-  cookieStore.set({
-    name: "expiresAt",
-    value: expiresAt,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: parseInt(process.env.NEXT_PUBLIC_REFRESHABLE_DURATION || "604800"),
-  });
 }
 
 export async function clearAuthCookies() {
   const cookieStore = await cookies();
   cookieStore.delete("accessToken");
   cookieStore.delete("refreshToken");
-  cookieStore.delete("expiresAt");
+}
+
+export async function getAdminAuthCookies() {
+  const cookieStore = await cookies();
+  return {
+    accessToken: cookieStore.get("adminAccessToken")?.value || null,
+    refreshToken: cookieStore.get("adminRefreshToken")?.value || null,
+  };
+}
+
+export async function setAdminAuthCookies(
+  accessToken: string,
+  refreshToken: string,
+) {
+  const cookieStore = await cookies();
+  cookieStore.set({
+    name: "adminAccessToken",
+    value: accessToken,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: parseInt(process.env.NEXT_PUBLIC_ACCESS_TOKEN_DURATION || "900"),
+  });
+
+  cookieStore.set({
+    name: "adminRefreshToken",
+    value: refreshToken,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: parseInt(process.env.NEXT_PUBLIC_REFRESHABLE_DURATION || "604800"),
+  });
+}
+
+export async function clearAdminAuthCookies() {
+  const cookieStore = await cookies();
+  cookieStore.delete("adminAccessToken");
+  cookieStore.delete("adminRefreshToken");
 }

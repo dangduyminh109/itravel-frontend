@@ -36,9 +36,9 @@ export async function POST(request: Request) {
       return NextResponse.json(response, { status: 200 });
     }
 
-    const { accessToken, refreshToken,expiresAt } = await res.response;
+    const { accessToken, refreshToken } = await res.response;
 
-    await setAuthCookies(accessToken, refreshToken, expiresAt);
+    await setAuthCookies(accessToken, refreshToken);
 
     const successResponse: ApiResponse<GoogleLoginResponse> = {
       success: true,

@@ -8,6 +8,7 @@ export interface RegisterData {
 export interface LoginData {
   identifier: string;
   password: string;
+  isAdmin?: boolean;
 }
 
 export interface ForgotPasswordData {

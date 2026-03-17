@@ -152,3 +152,10 @@ export async function restoreUser(id: string): Promise<ApiResponse<null>> {
   });
   return result;
 }
+
+export async function getGeneralInfo(): Promise<ApiResponse<UserGeneralInfo>> {
+  const result = await apiClient<UserGeneralInfo>(`/user/general-info`, {
+    method: "GET",
+  });
+  return result;
+}

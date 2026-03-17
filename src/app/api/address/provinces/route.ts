@@ -1,10 +1,11 @@
 import { Province } from "@/types/address";
 import ApiResponse from "@/types/ApiResponse.type";
 import { NextResponse } from "next/server";
+const BASE_API_URL = process.env.NEXT_PUBLIC_ADDRESS_API_URL || "";
 
 export async function GET(request: Request) {
   try {
-    const result = await fetch("https://provinces.open-api.vn/api/v2/p/", {
+    const result = await fetch(`${BASE_API_URL}/p/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });

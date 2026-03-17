@@ -222,3 +222,15 @@ export async function restoreCustomer(id: string): Promise<ApiResponse<null>> {
   });
   return result;
 }
+
+export async function getGeneralInfo(): Promise<
+  ApiResponse<CustomerGeneralInfo>
+> {
+  const result = await apiClient<CustomerGeneralInfo>(
+    `/customer/general-info`,
+    {
+      method: "GET",
+    },
+  );
+  return result;
+}
