@@ -41,7 +41,10 @@ const Table = () => {
             </Button>
           </Field>
         </form>
-        <Button onClick={() => router.push(`/${locale}/admin/user/create`)}>
+        <Button
+          className="cursor-pointer"
+          onClick={() => router.push(`/${locale}/admin/user/create`)}
+        >
           <FontAwesomeIcon icon={faPlus} />
           New User
         </Button>

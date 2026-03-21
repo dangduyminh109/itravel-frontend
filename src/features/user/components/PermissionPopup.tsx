@@ -11,12 +11,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faScrewdriverWrench,
-} from "@fortawesome/free-solid-svg-icons";
-import { Permission } from "@/types/permission";
+import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
+import { Permission } from "@/features/role/types/permission";
 import { toast } from "sonner";
-import { getPermissions } from "../services/permission.service";
+import { getPermissions } from "../../role/services/role.service";
 import { PermissionOverride } from "../types/user.type";
 
 const PermissionPopup = ({

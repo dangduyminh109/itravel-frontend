@@ -50,7 +50,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { formatDate } from "@/lib/utils";
 import { useParams, useRouter } from "next/dist/client/components/navigation";
 import { Customer } from "@/features/customer/types/customer.type";
-import { Role } from "@/types/role";
+import { Role } from "@/features/role/types/role.type";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { UpdateCustomerData } from "@/features/customer/types/customerData.type";

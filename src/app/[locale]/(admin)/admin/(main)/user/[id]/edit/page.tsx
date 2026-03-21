@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/select";
 import { useParams, useRouter } from "next/dist/client/components/navigation";
 import { PermissionOverride, User } from "@/features/user/types/user.type";
-import { Role } from "@/types/role";
+import { Role } from "@/features/role/types/role.type";
 import RolePopup from "@/features/user/components/RolePopup";
 import { Badge } from "@/components/ui/badge";
 import PermissionPopup from "@/features/user/components/PermissionPopup";

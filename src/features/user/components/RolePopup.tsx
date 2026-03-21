@@ -1,6 +1,6 @@
-import { Role } from "@/types/role";
+import { Role } from "@/features/role/types/role.type";
 import { useEffect, useState } from "react";
-import { getRoles } from "../services/role.service";
+import { getRoles } from "../../role/services/role.service";
 import { Button } from "@/components/ui/button";
 import { DialogHeader } from "@/components/ui/dialog";
 import { FieldGroup, Field } from "@/components/ui/field";

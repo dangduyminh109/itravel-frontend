@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { getUser } from "@/features/user/services/user.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "@/i18n/navigation";
-import { getPermissions } from "@/features/user/services/permission.service";
+import { getPermissions } from "@/features/role/services/role.service";
 import { DialogHeader } from "@/components/ui/dialog";
 import {
   Dialog,
@@ -46,7 +46,9 @@ const page = async ({
   const result = await getUser(id);
   if (result.success) {
     user = result.response;
-    permissionList = [...user.roleList].flatMap((role) => role.permissionList);
+      permissionList = [...user.roleList].flatMap(
+        (role) => role.permissionList,
+      );
     permissionResult = await getPermissions();
   }
 

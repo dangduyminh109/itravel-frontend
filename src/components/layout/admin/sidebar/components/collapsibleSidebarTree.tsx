@@ -1,4 +1,9 @@
-import { faHouse, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHouse,
+  faUser,
+  faUserGear,
+  faUsers,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export type SidebarItem =
   | { name: string; icon: React.ReactNode; path: string }
@@ -19,6 +24,11 @@ const fileTree: SidebarItem[] = [
     name: "customer",
     icon: <FontAwesomeIcon icon={faUsers} />,
     path: "/admin/customer",
+  },
+  {
+    name: "role",
+    icon: <FontAwesomeIcon icon={faUserGear} />,
+    path: "/admin/role",
   },
 ];
 

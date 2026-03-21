@@ -47,7 +47,7 @@ import { useRouter } from "next/dist/client/components/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Role } from "@/types/role";
+import { Role } from "@/features/role/types/role.type";
 import { useLoadingStore } from "@/store/loading.store";
 import { FieldDescription } from "@/components/ui/field";
 import { createCustomerSchema } from "@/features/customer/schemas/create-customer.schema";
@@ -76,7 +76,7 @@ const page = () => {
     passportExpiryDate: false,
     identityCardIssueDate: false,
   });
-  const [selectedRole, setSelectedRole] = useState<Set<Role>>(new Set());
+  const [selectedRole] = useState<Set<Role>>(new Set());
   const avatarRef = useRef<HTMLInputElement>(null);
   const [avartarUrl, setAvatarUrl] = useState<string | null>(null);
   const [provinceList, setProvinceList] = useState<Province[]>([]);

@@ -23,7 +23,7 @@ import {
   faVenusMars,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "@/lib/utils";
-import { getPermissions } from "@/features/user/services/permission.service";
+import { getPermissions } from "@/features/role/services/role.service";
 import { getProvince, getWard } from "@/features/auth/services/address.service";
 import { Province, Ward } from "@/types/address";
 

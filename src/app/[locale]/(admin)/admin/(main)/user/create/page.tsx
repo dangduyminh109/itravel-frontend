@@ -39,7 +39,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PermissionPopup from "@/features/user/components/PermissionPopup";
-import { Role } from "@/types/role";
+import { Role } from "@/features/role/types/role.type";
 import { PermissionOverride } from "@/features/user/types/user.type";
 import { createUser } from "@/features/user/services/user.service";
 import { CreateUserData } from "@/features/user/types/userData.type";
