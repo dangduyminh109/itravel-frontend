@@ -28,11 +28,10 @@ export type CustomBreadcrumbProps = {
     href: string;
   }[];
 };
-
-export function CustomBreadcrumb({
+const CustomBreadcrumb = ({
   title,
   listBreadcrumb,
-}: CustomBreadcrumbProps) {
+}: CustomBreadcrumbProps) => {
   return (
     <div>
       <h1 className="font-bold text-xl">{title}</h1>
@@ -44,7 +43,8 @@ export function CustomBreadcrumb({
       </Breadcrumb>
     </div>
   );
-}
+};
+export default CustomBreadcrumb;
 
 const RenderBreadcrumb = ({
   listBreadcrumb,

@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createUserSchema } from "@/features/user/schemas/create-user.schema";

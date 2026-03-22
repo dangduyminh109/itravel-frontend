@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { Input } from "@/components/ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -121,8 +121,8 @@ const page = () => {
 
   useEffect(() => {
     async function loadWard() {
-        const provinceId = Number(watchProvinceId);
-        if (!provinceId) return;
+      const provinceId = Number(watchProvinceId);
+      if (!provinceId) return;
       if (provinceId) {
         setIsLoadingAddress(true);
         try {

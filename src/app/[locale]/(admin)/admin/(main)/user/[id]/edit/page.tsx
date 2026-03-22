@@ -1,5 +1,5 @@
 "use client";
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { updateUserSchema } from "@/features/user/schemas/update-user.schema";
 import { getUser, updateUser } from "@/features/user/services/user.service";
 import { z } from "zod";

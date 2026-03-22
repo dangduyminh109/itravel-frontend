@@ -1,5 +1,5 @@
 "use client";
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import {
   getCustomer,
   updateCustomer,

@@ -1,4 +1,4 @@
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import GeneralInfo, {
   GeneralInfoType,
 } from "@/components/shared/generaInfo/GeneralInfo";

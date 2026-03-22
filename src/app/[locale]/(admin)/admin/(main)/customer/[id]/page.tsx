@@ -1,4 +1,4 @@
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { getCustomer } from "@/features/customer/services/customer.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

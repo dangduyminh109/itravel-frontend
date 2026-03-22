@@ -1,4 +1,4 @@
-import { CustomBreadcrumb } from "@/components/shared/breadcrumb/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { getUser } from "@/features/user/services/user.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -46,9 +46,7 @@ const page = async ({
   const result = await getUser(id);
   if (result.success) {
     user = result.response;
-      permissionList = [...user.roleList].flatMap(
-        (role) => role.permissionList,
-      );
+    permissionList = [...user.roleList].flatMap((role) => role.permissionList);
     permissionResult = await getPermissions();
   }
 
