@@ -5,12 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { columns } from "@/features/customer/components/table/Column";
+import { columns } from "@/features/tour/components/table/Column";
 import {
-  deleteCustomer,
-  getCustomers,
-  restoreCustomer,
-} from "@/features/customer/services/customer.service";
+  deleteCategory,
+  getCategories,
+  restoreCategory,
+} from "@/features/tour/services/category.service";
 import { useRouter } from "next/dist/client/components/navigation";
 import { Fragment, useRef, useState } from "react";
 import { useLocale } from "next-intl";
@@ -32,7 +32,7 @@ const Table = () => {
           <Field orientation="horizontal">
             <Input
               type="search"
-              placeholder="Enter customer name, email, or phone..."
+              placeholder="Enter category name..."
               ref={searchRef}
               className="w-full"
             />
@@ -43,20 +43,20 @@ const Table = () => {
         </form>
         <Button
           className="cursor-pointer"
-          onClick={() => router.push(`/${locale}/admin/customer/create`)}
+          onClick={() => router.push(`/${locale}/admin/tour/category/create`)}
         >
           <FontAwesomeIcon icon={faPlus} />
-          New Customer
+          New Category
         </Button>
       </div>
       <div className="mt-2">
         <DataTable
-          objPath="customer"
+          objPath="tour/category"
           columns={columns}
-          getData={getCustomers}
+          getData={getCategories}
           hasTrash={true}
-          deleteAction={deleteCustomer}
-          restoreAction={restoreCustomer}
+          deleteAction={deleteCategory}
+          restoreAction={restoreCategory}
           searchKeyword={searchKeyword}
         />
       </div>

@@ -98,7 +98,7 @@ const page = () => {
     });
     const result = await destroyRole(roleId);
     if (result.success) {
-      toast.success(result.message || "Destroyed successfully");
+      toast.success("Destroyed successfully");
       const res = await getRoles({});
       if (res.success) {
         setListRole(res.response);

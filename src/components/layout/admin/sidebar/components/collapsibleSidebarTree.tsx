@@ -1,5 +1,9 @@
 import {
   faHouse,
+  faLocationDot,
+  faMap,
+  faMapLocationDot,
+  faTableList,
   faUser,
   faUserGear,
   faUsers,
@@ -29,6 +33,28 @@ const fileTree: SidebarItem[] = [
     name: "role",
     icon: <FontAwesomeIcon icon={faUserGear} />,
     path: "/admin/role",
+  },
+  {
+    name: "Tour Management",
+    icon: <FontAwesomeIcon icon={faMapLocationDot} />,
+    path: "/admin/tour",
+    items: [
+      {
+        name: "Tour",
+        icon: <FontAwesomeIcon icon={faMap} />,
+        path: "/admin/tour",
+      },
+      {
+        name: "category",
+        icon: <FontAwesomeIcon icon={faTableList} />,
+        path: "/admin/tour/category",
+      },
+      {
+        name: "location",
+        icon: <FontAwesomeIcon icon={faLocationDot} />,
+        path: "/admin/tour/location",
+      },
+    ],
   },
 ];
 

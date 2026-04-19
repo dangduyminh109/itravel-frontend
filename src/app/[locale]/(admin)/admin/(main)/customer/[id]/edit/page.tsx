@@ -47,7 +47,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Input } from "@/components/ui/input";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Calendar } from "@/components/ui/calendar";
-import { formatDate } from "@/lib/utils";
 import { useParams, useRouter } from "next/dist/client/components/navigation";
 import { Customer } from "@/features/customer/types/customer.type";
 import { Role } from "@/features/role/types/role.type";

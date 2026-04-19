@@ -138,9 +138,7 @@ export function DataTable<TData, TValue>({
       const result = await deleteAction(obj.id, trash);
       if (result.success) {
         toast.success(
-          result.message || trash
-            ? "Destroyed successfully"
-            : "Deleted successfully",
+          trash ? "Destroyed successfully" : "Deleted successfully",
         );
         const res = await getData({
           deleted: trash,

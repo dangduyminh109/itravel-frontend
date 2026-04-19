@@ -27,7 +27,7 @@ const renderItem = (
             className="group w-full justify-between transition-none 
             hover:bg-accent cursor-pointer"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 capitalize">
               {fileItem.icon && fileItem.icon}
               {fileItem.name}
             </div>
@@ -36,7 +36,9 @@ const renderItem = (
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-1 ml-5 style-lyra:ml-4">
           <div className="flex flex-col gap-1">
-            {fileItem.items.map((child) => renderItem(child, activeItem, setActive))}
+            {fileItem.items.map((child) =>
+              renderItem(child, activeItem, setActive),
+            )}
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -51,7 +53,7 @@ const renderItem = (
         setActive(fileItem.name);
       }}
       variant={activeItem === fileItem.name ? "default" : "ghost"}
-      className="w-full justify-start gap-2 text-background-foreground cursor-pointer"
+      className="w-full justify-start gap-2 text-background-foreground cursor-pointer capitalize"
     >
       {fileItem.icon && fileItem.icon}
       <span>{fileItem.name}</span>
@@ -60,7 +62,8 @@ const renderItem = (
 };
 
 const Sidebar = () => {
-  const { isOpen, toggleSidebar , activeItem, setActiveItem} = useSidebarStore();
+  const { isOpen, toggleSidebar, activeItem, setActiveItem } =
+    useSidebarStore();
   return (
     <>
       {isOpen && (
