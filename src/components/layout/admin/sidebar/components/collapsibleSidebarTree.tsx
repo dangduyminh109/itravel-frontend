@@ -30,6 +30,11 @@ const fileTree: SidebarItem[] = [
     path: "/admin/customer",
   },
   {
+    name: "location",
+    icon: <FontAwesomeIcon icon={faLocationDot} />,
+    path: "/admin/location",
+  },
+  {
     name: "role",
     icon: <FontAwesomeIcon icon={faUserGear} />,
     path: "/admin/role",
@@ -48,11 +53,6 @@ const fileTree: SidebarItem[] = [
         name: "category",
         icon: <FontAwesomeIcon icon={faTableList} />,
         path: "/admin/tour/category",
-      },
-      {
-        name: "location",
-        icon: <FontAwesomeIcon icon={faLocationDot} />,
-        path: "/admin/tour/location",
       },
     ],
   },
