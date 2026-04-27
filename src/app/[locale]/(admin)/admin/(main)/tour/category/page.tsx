@@ -1,7 +1,7 @@
 import CustomBreadcrumb from "@/components/shared/breadcrumb/CustomBreadcrumb";
 import type { GeneralInfoType } from "@/components/shared/generaInfo/GeneralInfo";
 import GeneralInfo from "@/components/shared/generaInfo/GeneralInfo";
-import Table from "@/features/tour/components/table/Table";
+import Table from "@/features/tour/components/category/table/Table";
 import { getCategoryGeneralInfo } from "@/features/tour/services/category.service";
 
 const page = async () => {

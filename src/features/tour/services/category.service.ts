@@ -10,7 +10,7 @@ import { CategoryGeneralInfo } from "../types/categoryGeneralInfo.type";
 interface GetCategoriesProps {
   status?: "ACTIVE" | "INACTIVE";
   keyword?: string;
-  deleted: boolean;
+  deleted?: boolean;
   page: number;
   size: number;
 }
@@ -22,8 +22,13 @@ export async function getCategories({
   size = 5,
   keyword,
 }: GetCategoriesProps): Promise<ApiResponse<PagingResponse<Category[]>>> {
+  const isDeletedParam = `isDeleted=${deleted}`;
+  const statusParam = status ? `status=${status}` : "";
+  const pageParam = `page=${page}`;
+  const sizeParam = `size=${size}`;
+  const keywordParam = keyword ? `keyword=${keyword}` : "";
   const result = await apiClient<PagingResponse<Category[]>>(
-    `/category?isDeleted=${deleted}&page=${page}&size=${size}${keyword ? `&keyword=${keyword}` : ""}`,
+    `/category?${isDeletedParam}&${statusParam}&${pageParam}&${sizeParam}&${keywordParam}`,
     {
       method: "GET",
     },

@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Category } from "../../types/category.type";
+import { Category } from "../../../types/category.type";
 import { formatDate } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/shared/table/DataTableColumnHeader";
@@ -56,7 +56,7 @@ export const columns: ColumnDef<Category>[] = [
     },
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "created at",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created At" />
     ),

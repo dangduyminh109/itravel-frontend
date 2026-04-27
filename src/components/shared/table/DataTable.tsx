@@ -233,7 +233,7 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="rounded-lg m-2 overflow-scroll max-h-100 max-w-[100%] border border-muted shadow">
+      <div className="rounded-lg m-2 overflow-auto max-h-100 max-w-[100%] border border-muted shadow">
         <Table>
           <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
             {table.getHeaderGroups().map((headerGroup) => (

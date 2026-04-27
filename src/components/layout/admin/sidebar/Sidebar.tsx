@@ -35,7 +35,7 @@ const renderItem = (
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-1 ml-5 style-lyra:ml-4">
-          <div className="flex flex-col gap-1">
+          <div className="overflow-hidden transition-all duration-300 ease-in-out data-[state=closed]:max-h-0 data-[state=open]:max-h-96">
             {fileItem.items.map((child) =>
               renderItem(child, activeItem, setActive),
             )}

@@ -6,6 +6,18 @@ export interface Tour {
   id: string;
   name: string;
   slug: string;
+  thumbnailUrl: string;
+  categoryName: string;
+  pricing: Pricing;
+  departureLocation: string;
+  destinationLocation: string;
+  status: "ACTIVE" | "INACTIVE" | "DRAFT";
+}
+
+export interface TourDetail {
+  id: string;
+  name: string;
+  slug: string;
   summary: string;
   description: string;
   status: "ACTIVE" | "INACTIVE" | "DRAFT";
