@@ -2,6 +2,7 @@ import { apiClient } from "@/lib/apiClient";
 import ApiResponse, { PagingResponse } from "@/types/ApiResponse.type";
 import { CreateTourData, UpdateTourData } from "../types/tourData.type";
 import { Tour, TourDetail } from "../types/tour.type";
+import { formatDate } from "@/lib/utils";
 // import { TourGeneralInfo } from "../types/tourGeneralInfo.type";
 
 interface GetToursProps {
@@ -63,30 +64,36 @@ export async function createTour(
         "pricing.adultPrice.originalPrice",
         tourData.pricing.adultPrice.originalPrice.toString(),
       );
-      data.append(
-        "pricing.adultPrice.discountPrice",
-        tourData.pricing.adultPrice.discountPrice.toString(),
-      );
+      if (tourData.pricing.adultPrice.discountPrice) {
+        data.append(
+          "pricing.adultPrice.discountPrice",
+          tourData.pricing.adultPrice.discountPrice.toString(),
+        );
+      }
     }
     if (tourData.pricing.childPrice) {
       data.append(
         "pricing.childPrice.originalPrice",
         tourData.pricing.childPrice.originalPrice.toString(),
       );
-      data.append(
-        "pricing.childPrice.discountPrice",
-        tourData.pricing.childPrice.discountPrice.toString(),
-      );
+      if (tourData.pricing.childPrice.discountPrice) {
+        data.append(
+          "pricing.childPrice.discountPrice",
+          tourData.pricing.childPrice.discountPrice.toString(),
+        );
+      }
     }
     if (tourData.pricing.infantPrice) {
       data.append(
         "pricing.infantPrice.originalPrice",
         tourData.pricing.infantPrice.originalPrice.toString(),
       );
-      data.append(
-        "pricing.infantPrice.discountPrice",
-        tourData.pricing.infantPrice.discountPrice.toString(),
-      );
+      if (tourData.pricing.infantPrice.discountPrice) {
+        data.append(
+          "pricing.infantPrice.discountPrice",
+          tourData.pricing.infantPrice.discountPrice.toString(),
+        );
+      }
     }
     if (tourData.pricing.singleSupplement) {
       data.append(
@@ -160,7 +167,10 @@ export async function createTour(
     if (schedule.departureDate) {
       data.append(
         `schedules[${index}].departureDate`,
-        schedule.departureDate.toISOString(),
+        formatDate({
+          dateString: schedule.departureDate.toISOString(),
+          type: "datetime",
+        }),
       );
     }
     if (schedule.totalSeats) {
@@ -211,25 +221,17 @@ export async function createTour(
       data.append(`schedules[${index}].status`, schedule.status);
     }
   });
-
   tourData.tourImages.forEach((image, index) => {
-    if (image.image) {
-      data.append(`tourImages[${index}].image`, image.image);
-    }
-    if (image.isThumbnail) {
-      data.append(
-        `tourImages[${index}].isThumbnail`,
-        image.isThumbnail.toString(),
-      );
-    }
+    data.append(`tourImages[${index}].image`, image.image);
+    data.append(
+      `tourImages[${index}].isThumbnail`,
+      image.isThumbnail.toString(),
+    );
   });
 
   const result = await apiClient<TourDetail>(`/tour`, {
     method: "POST",
     body: data,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   });
   return result;
 }
@@ -257,30 +259,36 @@ export async function updateTour(
         "pricing.adultPrice.originalPrice",
         tourData.pricing.adultPrice.originalPrice.toString(),
       );
-      data.append(
-        "pricing.adultPrice.discountPrice",
-        tourData.pricing.adultPrice.discountPrice.toString(),
-      );
+      if (tourData.pricing.adultPrice.discountPrice) {
+        data.append(
+          "pricing.adultPrice.discountPrice",
+          tourData.pricing.adultPrice.discountPrice.toString(),
+        );
+      }
     }
     if (tourData.pricing.childPrice) {
       data.append(
         "pricing.childPrice.originalPrice",
         tourData.pricing.childPrice.originalPrice.toString(),
       );
-      data.append(
-        "pricing.childPrice.discountPrice",
-        tourData.pricing.childPrice.discountPrice.toString(),
-      );
+      if (tourData.pricing.childPrice.discountPrice) {
+        data.append(
+          "pricing.childPrice.discountPrice",
+          tourData.pricing.childPrice.discountPrice.toString(),
+        );
+      }
     }
     if (tourData.pricing.infantPrice) {
       data.append(
         "pricing.infantPrice.originalPrice",
         tourData.pricing.infantPrice.originalPrice.toString(),
       );
-      data.append(
-        "pricing.infantPrice.discountPrice",
-        tourData.pricing.infantPrice.discountPrice.toString(),
-      );
+      if (tourData.pricing.infantPrice.discountPrice) {
+        data.append(
+          "pricing.infantPrice.discountPrice",
+          tourData.pricing.infantPrice.discountPrice.toString(),
+        );
+      }
     }
     if (tourData.pricing.singleSupplement) {
       data.append(
@@ -378,16 +386,20 @@ export async function updateTour(
           `schedules[${index}].pricing.adultPrice.originalPrice`,
           schedule.pricing.adultPrice.originalPrice.toString(),
         );
-        data.append(
-          `schedules[${index}].pricing.adultPrice.discountPrice`,
-          schedule.pricing.adultPrice.discountPrice.toString(),
-        );
+        if (schedule.pricing.adultPrice.discountPrice) {
+          data.append(
+            `schedules[${index}].pricing.adultPrice.discountPrice`,
+            schedule.pricing.adultPrice.discountPrice.toString(),
+          );
+        }
       }
-      if (schedule.pricing.childPrice) {
-        data.append(
-          `schedules[${index}].pricing.childPrice.originalPrice`,
-          schedule.pricing.childPrice.originalPrice.toString(),
-        );
+    }
+    if (schedule.pricing.childPrice) {
+      data.append(
+        `schedules[${index}].pricing.childPrice.originalPrice`,
+        schedule.pricing.childPrice.originalPrice.toString(),
+      );
+      if (schedule.pricing.childPrice.discountPrice) {
         data.append(
           `schedules[${index}].pricing.childPrice.discountPrice`,
           schedule.pricing.childPrice.discountPrice.toString(),

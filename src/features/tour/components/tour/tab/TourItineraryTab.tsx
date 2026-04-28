@@ -8,6 +8,15 @@ import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useState } from "react";
 
 type TourItineraryTabProps = {
   register: any;
@@ -17,12 +26,13 @@ type TourItineraryTabProps = {
     days: number;
     nights: number;
   };
+  getValues: any;
   itinerary: any;
   setValue: any;
 };
 
 const TourItineraryTab = (props: TourItineraryTabProps) => {
-  const { register, errors, duration, itinerary, setValue } = props;
+  const { register, errors, duration, itinerary, getValues, setValue } = props;
   function handleOpen(e: any) {
     const parent = e.currentTarget.parentElement;
     const desc = parent.querySelector(".desc");
@@ -36,6 +46,10 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
       }
     }
   }
+
+  const [itineraries, setItineraries] = useState(
+    getValues("itineraries") || [],
+  );
 
   return (
     <div>
@@ -57,9 +71,9 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
                       {...register("duration.days", { valueAsNumber: true })}
                     />
                   </InputGroup>
-                  {errors["duration.days"]?.message && (
+                  {errors?.duration?.days?.message && (
                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors["duration.days"].message}
+                      {errors.duration.days.message}
                     </FieldDescription>
                   )}
                 </Field>
@@ -75,9 +89,9 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
                       {...register("duration.nights", { valueAsNumber: true })}
                     />
                   </InputGroup>
-                  {errors["duration.nights"]?.message && (
+                  {errors?.duration?.nights?.message && (
                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors["duration.nights"].message}
+                      {errors.duration.nights.message}
                     </FieldDescription>
                   )}
                 </Field>
@@ -90,16 +104,18 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
                     size={"sm"}
                     className="cursor-pointer"
                     onClick={() => {
-                      const currentItineraries = itinerary || [];
+                      const currentItineraries = itineraries || [];
                       const newItinerary = {
                         dayNumber: currentItineraries.length + 1,
                         title: "",
                         description: "",
+                        activities: [""],
                       };
                       setValue("itineraries", [
                         ...currentItineraries,
                         newItinerary,
                       ]);
+                      setItineraries((prev: any) => [...prev, newItinerary]);
                       if (newItinerary.dayNumber > duration.days) {
                         setValue("duration.days", newItinerary.dayNumber);
                         if (duration.nights < newItinerary.dayNumber - 1) {
@@ -115,7 +131,7 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
                     Add Itinerary
                   </Button>
                 </div>
-                {itinerary.map((item: any, index: number) => {
+                {itineraries.map((item: any, index: number) => {
                   return (
                     <Card className="mt-2" key={index}>
                       <CardHeader
@@ -169,7 +185,120 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
                                 {...register(`itineraries.${index}.title`)}
                               />
                             </InputGroup>
+                            {errors.itineraries?.[index]?.title?.message && (
+                              <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                {errors.itineraries?.[index]?.title?.message}
+                              </FieldDescription>
+                            )}
                           </Field>
+                          <div className="w-full">
+                            <div className="rounded-lg mt-2 overflow-auto max-h-100 max-w-[100%] border border-muted shadow">
+                              <Table>
+                                <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
+                                  <TableRow>
+                                    <TableHead>
+                                      <div className="flex items-center justify-between">
+                                        <span>Activities</span>
+                                        <Button
+                                          type="button"
+                                          size="icon"
+                                          onClick={() => {
+                                            setValue(
+                                              `itineraries.${index}.activities`,
+                                              [
+                                                ...getValues(
+                                                  `itineraries.${index}.activities`,
+                                                ),
+                                                "",
+                                              ],
+                                            );
+                                          }}
+                                        >
+                                          <FontAwesomeIcon icon={faPlus} />
+                                        </Button>
+                                      </div>
+                                    </TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  <TableRow>
+                                    <TableCell className="font-medium align-top">
+                                      {getValues(
+                                        `itineraries.${index}.activities`,
+                                      ).map((_: string, itemIndex: number) => (
+                                        <div
+                                          className="w-full relative my-4"
+                                          key={`${index}-${itemIndex}`}
+                                        >
+                                          <Field
+                                            className="gap-1 col-span-5 relative mb-2"
+                                            key={`${index}-${itemIndex}`}
+                                          >
+                                            <Textarea
+                                              id={`itineraries.${index}.activities.${itemIndex}`}
+                                              placeholder="Enter activity"
+                                              className="min-h-[60px]"
+                                              {...register(
+                                                `itineraries.${index}.activities.${itemIndex}`,
+                                              )}
+                                            />
+                                          </Field>
+                                          {errors.itineraries?.[index]
+                                            ?.activities?.[itemIndex]
+                                            ?.message && (
+                                            <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                              {
+                                                errors.itineraries?.[index]
+                                                  ?.activities?.[itemIndex]
+                                                  ?.message
+                                              }
+                                            </FieldDescription>
+                                          )}
+                                          {itemIndex > 0 && (
+                                            <Button
+                                              className="rounded-full cursor-pointer md:h-6 md:w-6 h-4 w-4
+                                                        absolute md:top-[-8px] md:right-[-8px] top-1 right-1 z-10"
+                                              size={"sm"}
+                                              variant={"destructive"}
+                                              type="button"
+                                              onClick={() => {
+                                                const currentActivities =
+                                                  itineraries[index]
+                                                    ?.activities || [];
+
+                                                currentActivities.splice(
+                                                  itemIndex,
+                                                  1,
+                                                );
+                                                setValue(
+                                                  `itineraries.${index}.activities`,
+                                                  currentActivities,
+                                                );
+                                                setItineraries((prev: any) => {
+                                                  const updated = [...prev];
+                                                  updated[index] = {
+                                                    ...updated[index],
+                                                    activities:
+                                                      currentActivities,
+                                                  };
+                                                  return updated;
+                                                });
+                                              }}
+                                            >
+                                              <FontAwesomeIcon
+                                                size="sm"
+                                                icon={faXmark}
+                                              />
+                                            </Button>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
                           <Field className="gap-1 mt-2">
                             <FieldLabel
                               htmlFor={`itineraries.${index}.description`}
@@ -179,7 +308,7 @@ const TourItineraryTab = (props: TourItineraryTabProps) => {
                             <Textarea
                               id={`itineraries.${index}.description`}
                               placeholder="Enter itinerary description"
-                              className="min-h-50"
+                              className="min-h-40"
                               {...register(`itineraries.${index}.description`)}
                             />
                           </Field>

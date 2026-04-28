@@ -13,18 +13,21 @@ import { toast } from "sonner";
 
 type TourImageTabProps = {
   isLoading: boolean;
+  tourImage: {
+    thumbnailImage: File | null;
+    imageList: File[];
+  };
+  setTourImage: React.Dispatch<
+    React.SetStateAction<{
+      thumbnailImage: File | null;
+      imageList: File[];
+    }>
+  >;
 };
 
 const TourImageTab = (props: TourImageTabProps) => {
-  const { isLoading } = props;
+  const { isLoading, tourImage, setTourImage } = props;
   const router = useRouter();
-  const [tourImage, setTourImage] = useState<{
-    thumbnailImage: File | null;
-    imageList: File[];
-  }>({
-    thumbnailImage: null,
-    imageList: [],
-  });
   const imagesRef = useRef<HTMLInputElement>(null);
   function handleChangeThumbnailImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

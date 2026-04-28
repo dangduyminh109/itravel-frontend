@@ -7,6 +7,7 @@ import {
   faChair,
   faMoneyBillWave,
   faPlus,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   InputGroup,
@@ -31,6 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 type TourScheduleTabProps = {
   setValue: any;
   getValues: any;
+  errors: any;
 };
 
 import { z } from "zod";
@@ -38,6 +40,15 @@ import { scheduleItemSchema } from "@/features/tour/schemas/create-tour.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 type scheduleItemSchema = z.infer<typeof scheduleItemSchema>;
 
@@ -45,6 +56,7 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
   const {
     setValue: setTourValue,
     getValues: getTourValues,
+    errors: tourErrors,
   } = props;
   const [isUpdate, setIsUpdate] = useState<number | null>(null);
 
@@ -59,41 +71,48 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
     resolver: zodResolver(scheduleItemSchema),
     defaultValues: {
       departureDate: new Date().toISOString().slice(0, 10),
-      totalSeats: 1,
+      totalSeats:
+        Number(getTourValues("participantLimit.maxParticipants")) || 1,
       surcharge: 0,
+      status: "OPEN",
       pricing: {
         adultPrice: {
           originalPrice:
-            Number(getTourValues("pricing.adultPrice.originalPrice")) || 0,
+            Number(getTourValues("pricing.adultPrice.originalPrice")) ||
+            undefined,
           discountPrice:
             Number(getTourValues("pricing.adultPrice.discountPrice")) || 0,
         },
         childPrice: {
           originalPrice:
-            Number(getTourValues("pricing.childPrice.originalPrice")) || 0,
+            Number(getTourValues("pricing.childPrice.originalPrice")) ||
+            undefined,
           discountPrice:
             Number(getTourValues("pricing.childPrice.discountPrice")) || 0,
         },
         infantPrice: {
           originalPrice:
-            Number(getTourValues("pricing.infantPrice.originalPrice")) || 0,
+            Number(getTourValues("pricing.infantPrice.originalPrice")) ||
+            undefined,
           discountPrice:
             Number(getTourValues("pricing.infantPrice.discountPrice")) || 0,
         },
-        singleSupplement: {
-          originalPrice:
-            Number(getTourValues("pricing.singleSupplement.originalPrice")) ||
-            0,
-          discountPrice:
-            Number(getTourValues("pricing.singleSupplement.discountPrice")) ||
-            0,
-        },
+        singleSupplement:
+          Number(getTourValues("pricing.singleSupplement")) || 0,
         currency: getTourValues("pricing.currency") || "VND",
       },
     },
   });
-
+  const minParticipants = getTourValues("participantLimit.minParticipants");
   const onCancel = () => {
+    setIsUpdate(null);
+    reset();
+  };
+
+  const onDelete = () => {
+    const updatedSchedules = [...(getTourValues("schedules") || [])];
+    updatedSchedules.splice(Number(isUpdate), 1);
+    setTourValue("schedules", updatedSchedules);
     setIsUpdate(null);
     reset();
   };
@@ -102,6 +121,18 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
     const isValid = await trigger();
     if (isValid) {
       const data = getValues();
+      console.log(
+        "Schedule data to submit:",
+        data,
+        data.totalSeats < minParticipants,
+        minParticipants,
+      );
+      if (data.totalSeats < minParticipants) {
+        toast.error(
+          `Total seats must be greater than or equal to minimum participants (${minParticipants})`,
+        );
+        return;
+      }
       if (isUpdate != null) {
         const updatedSchedules = [...(getTourValues("schedules") || [])];
         updatedSchedules[isUpdate] = data;
@@ -177,28 +208,47 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                 )}
               </div>
               <div className="md:col-span-3 col-span-5 grid grid-cols-2 gap-1">
-                <Field className="gap-1 col-span-2 md:col-span-1">
-                  <FieldLabel htmlFor="totalSeats">Total Seats</FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      id="totalSeats"
-                      type="number"
-                      placeholder="Enter totalSeats"
-                      {...register("totalSeats", { valueAsNumber: true })}
-                    />
-                    <InputGroupAddon align="inline-start">
-                      <FontAwesomeIcon
-                        className={"text-primary"}
-                        icon={faChair}
-                      />
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {errors.totalSeats?.message && (
-                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.totalSeats.message}
-                    </FieldDescription>
+                <Controller
+                  name="totalSeats"
+                  control={control}
+                  render={({ field }) => (
+                    <Field className="gap-1 col-span-2 md:col-span-1">
+                      <FieldLabel htmlFor="totalSeats">Total Seats</FieldLabel>
+                      <InputGroup>
+                        <InputGroupInput
+                          id="totalSeats"
+                          type="number"
+                          placeholder="Enter totalSeats"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+
+                        <InputGroupAddon align="inline-start">
+                          <FontAwesomeIcon
+                            className="text-primary"
+                            icon={faChair}
+                          />
+                        </InputGroupAddon>
+                      </InputGroup>
+
+                      {errors.totalSeats?.message && (
+                        <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                          {errors.totalSeats.message}
+                        </FieldDescription>
+                      )}
+
+                      {Number(field.value) < minParticipants && (
+                        <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                          Total seats must be greater than or equal to minimum
+                          participants ({minParticipants})
+                        </FieldDescription>
+                      )}
+                    </Field>
                   )}
-                </Field>
+                />
+
                 <Field className="gap-1 col-span-2 md:col-span-1">
                   <FieldLabel htmlFor="surcharge">Surcharge</FieldLabel>
                   <InputGroup>
@@ -272,6 +322,11 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                       {errors.pricing.adultPrice.discountPrice.message}
                     </FieldDescription>
                   )}
+                  {errors.pricing?.adultPrice?.message && (
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.pricing.adultPrice.message}
+                    </FieldDescription>
+                  )}
                 </Field>
                 <Field className="gap-1 col-span-2 md:col-span-1">
                   <FieldLabel htmlFor="pricing.childPrice.originalPrice">
@@ -322,6 +377,11 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                   {errors.pricing?.childPrice?.discountPrice?.message && (
                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
                       {errors.pricing.childPrice.discountPrice.message}
+                    </FieldDescription>
+                  )}
+                  {errors.pricing?.childPrice?.message && (
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.pricing.childPrice.message}
                     </FieldDescription>
                   )}
                 </Field>
@@ -376,17 +436,23 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                       {errors.pricing.infantPrice.discountPrice.message}
                     </FieldDescription>
                   )}
+
+                  {errors.pricing?.infantPrice?.message && (
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.pricing.infantPrice.message}
+                    </FieldDescription>
+                  )}
                 </Field>
                 <Field className="gap-1 col-span-2 md:col-span-1">
-                  <FieldLabel htmlFor="pricing.singleSupplement.originalPrice">
-                    Single Supplement Original Price
+                  <FieldLabel htmlFor="pricing.singleSupplement">
+                    Single Supplement
                   </FieldLabel>
                   <InputGroup>
                     <InputGroupInput
-                      id="pricing.singleSupplement.originalPrice"
+                      id="pricing.singleSupplement"
                       type="number"
-                      placeholder="Enter original price"
-                      {...register("pricing.singleSupplement.originalPrice", {
+                      placeholder="Enter single supplement"
+                      {...register("pricing.singleSupplement", {
                         valueAsNumber: true,
                       })}
                     />
@@ -397,49 +463,70 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                       />
                     </InputGroupAddon>
                   </InputGroup>
-                  {errors.pricing?.singleSupplement?.originalPrice?.message && (
+                  {errors.pricing?.singleSupplement?.message && (
                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.pricing.singleSupplement.originalPrice.message}
+                      {errors.pricing.singleSupplement.message}
                     </FieldDescription>
                   )}
                 </Field>
-                <Field className="gap-1 col-span-2 md:col-span-1">
-                  <FieldLabel htmlFor="pricing.singleSupplement.discountPrice">
-                    Single Supplement Discount Price
-                  </FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      id="pricing.singleSupplement.discountPrice"
-                      type="number"
-                      placeholder="Enter discount price"
-                      {...register("pricing.singleSupplement.discountPrice", {
-                        valueAsNumber: true,
-                      })}
-                    />
-                    <InputGroupAddon align="inline-start">
-                      <FontAwesomeIcon
-                        className={"text-primary"}
-                        icon={faMoneyBillWave}
-                      />
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {errors.pricing?.singleSupplement?.discountPrice?.message && (
-                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.pricing.singleSupplement.discountPrice.message}
-                    </FieldDescription>
-                  )}
-                </Field>
+                <div className="col-span-2 md:col-span-1">
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                      <Field className="gap-1 w-full">
+                        <FieldLabel htmlFor="status">Status</FieldLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="status" className="w-full">
+                            <SelectValue placeholder="select status" />
+                          </SelectTrigger>
+
+                          <SelectContent className="bg-background">
+                            <SelectGroup>
+                              <SelectItem value="UPCOMING">Upcoming</SelectItem>
+                              <SelectItem value="OPEN">Open</SelectItem>
+                              <SelectItem value="FULL">Full</SelectItem>
+                              <SelectItem value="CANCELLED">
+                                Cancelled
+                              </SelectItem>
+                              <SelectItem value="COMPLETED">
+                                Completed
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        {errors.status?.message && (
+                          <p className="mt-1 text-red-500 text-xs ml-1">
+                            {errors.status?.message}
+                          </p>
+                        )}
+                      </Field>
+                    )}
+                  />
+                </div>
               </div>
               <div className="col-span-5 text-center">
                 {isUpdate !== null && (
-                  <Button
-                    type="button"
-                    onClick={() => onCancel()}
-                    className="bg-secondary hover:bg-secondary cursor-pointer mx-2"
-                  >
-                    <FontAwesomeIcon icon={faArrowRotateLeft} />
-                    Cancel
-                  </Button>
+                  <>
+                    <Button
+                      type="button"
+                      onClick={() => onDelete()}
+                      className="bg-[var(--error)] hover:bg-[var(--error)] cursor-pointer mx-2"
+                    >
+                      <FontAwesomeIcon icon={faTrash} /> Delete
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => onCancel()}
+                      className="bg-secondary hover:bg-secondary cursor-pointer mx-2"
+                    >
+                      <FontAwesomeIcon icon={faArrowRotateLeft} />
+                      Cancel
+                    </Button>
+                  </>
                 )}
                 <Button
                   type="button"
@@ -459,10 +546,17 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
               <CardHeader className="p-4">
                 <CardTitle className="flex justify-between items-center">
                   <span>Schedules</span>
-                  <span>Currency: {getTourValues("currency") || "VND"}</span>
+                  <span>
+                    Currency: {getTourValues("pricing.currency") || "VND"}
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {tourErrors?.schedules?.message && (
+                  <FieldDescription className="text-red-500 text-center mt-1 ml-1">
+                    {tourErrors.schedules.message}
+                  </FieldDescription>
+                )}
                 <div className="col-span-5 rounded-lg mt-2 overflow-auto max-h-100 max-w-[100%] border border-muted shadow">
                   <Table>
                     <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
@@ -473,7 +567,7 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                         <TableHead>Adult Price</TableHead>
                         <TableHead>Child Price</TableHead>
                         <TableHead>Infant Price</TableHead>
-                        <TableHead>Single Supplement Price</TableHead>
+                        <TableHead>Single Supplement</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -565,31 +659,8 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                                   </TableBody>
                                 </Table>
                               </TableCell>
-                              <TableCell className="p-0">
-                                <Table>
-                                  <TableHeader className="bg-secondary [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
-                                    <TableRow>
-                                      <TableHead>Original</TableHead>
-                                      <TableHead>Discount</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    <TableRow>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.singleSupplement
-                                            ?.originalPrice
-                                        }
-                                      </TableCell>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.singleSupplement
-                                            ?.discountPrice
-                                        }
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
+                              <TableCell className="p-0 text-center">
+                                {item.pricing?.singleSupplement || 0}
                               </TableCell>
                             </TableRow>
                           ),

@@ -9,7 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { faMap, faMoneyBillWave } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMap,
+  faMoneyBillWave,
+  faPlus,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   InputGroup,
   InputGroupAddon,
@@ -29,17 +34,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 type TourDescTabProps = {
   register: any;
   control: any;
   errors: any;
+  setValue: any;
+  getValues: any;
   categories: { id: number; name: string }[];
   flatLocations: { id: number; name: string; type: string; depth: number }[];
 };
 
 const TourDescTab = (props: TourDescTabProps) => {
-  const { register, control, errors, categories, flatLocations } = props;
+  const {
+    register,
+    control,
+    errors,
+    setValue,
+    getValues,
+    categories,
+    flatLocations,
+  } = props;
+  const [services, setServices] = useState({
+    includedServices: getValues("services.includedServices") || [],
+    excludedServices: getValues("services.excludedServices") || [],
+  });
 
   return (
     <div>
@@ -58,7 +80,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                     <Field className="gap-1 w-full">
                       <FieldLabel htmlFor="categoryId">Category</FieldLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => field.onChange(Number(value))}
                         value={field.value ? String(field.value) : ""}
                       >
                         <SelectTrigger id="categoryId" className="w-full">
@@ -103,7 +125,9 @@ const TourDescTab = (props: TourDescTabProps) => {
                           Departure Location
                         </FieldLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(value) =>
+                            field.onChange(Number(value))
+                          }
                           value={field.value ? String(field.value) : ""}
                         >
                           <SelectTrigger
@@ -151,7 +175,9 @@ const TourDescTab = (props: TourDescTabProps) => {
                           Destination Location
                         </FieldLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(value) =>
+                            field.onChange(Number(value))
+                          }
                           value={field.value ? String(field.value) : ""}
                         >
                           <SelectTrigger
@@ -192,38 +218,47 @@ const TourDescTab = (props: TourDescTabProps) => {
               </div>
               <div className="col-span-5 flex gap-3 flex-wrap">
                 <Field className="gap-1 flex-1">
-                  <FieldLabel htmlFor="minParticipants">
+                  <FieldLabel htmlFor="participantLimit.minParticipants">
                     Min Participants
                   </FieldLabel>
                   <InputGroup>
                     <InputGroupInput
-                      id="minParticipants"
+                      id="participantLimit.minParticipants"
                       type="number"
                       placeholder="Enter min participants"
-                      {...register("minParticipants", { valueAsNumber: true })}
+                      {...register("participantLimit.minParticipants", {
+                        valueAsNumber: true,
+                      })}
                     />
                   </InputGroup>
-                  {errors.minParticipants?.message && (
+                  {errors.participantLimit?.minParticipants?.message && (
                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.minParticipants.message}
+                      {errors.participantLimit.minParticipants.message}
                     </FieldDescription>
                   )}
                 </Field>
                 <Field className="gap-1 flex-1">
-                  <FieldLabel htmlFor="maxParticipants">
+                  <FieldLabel htmlFor="participantLimit.maxParticipants">
                     Max Participants
                   </FieldLabel>
                   <InputGroup>
                     <InputGroupInput
-                      id="maxParticipants"
+                      id="participantLimit.maxParticipants"
                       type="number"
                       placeholder="Enter max participants"
-                      {...register("maxParticipants", { valueAsNumber: true })}
+                      {...register("participantLimit.maxParticipants", {
+                        valueAsNumber: true,
+                      })}
                     />
                   </InputGroup>
-                  {errors.maxParticipants?.message && (
+                  {errors?.participantLimit?.maxParticipants?.message && (
                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                      {errors.maxParticipants.message}
+                      {errors.participantLimit.maxParticipants.message}
+                    </FieldDescription>
+                  )}
+                  {errors?.participantLimit?.message && (
+                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                      {errors.participantLimit.message}
                     </FieldDescription>
                   )}
                 </Field>
@@ -272,7 +307,10 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   placeholder="Enter price"
                                   {...register(
                                     "pricing.adultPrice.originalPrice",
-                                    { valueAsNumber: true },
+                                    {
+                                      setValueAs: (v: string) =>
+                                        v === "" ? undefined : Number(v),
+                                    },
                                   )}
                                 />
                                 <InputGroupAddon align="inline-start">
@@ -302,7 +340,10 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   placeholder="Enter price"
                                   {...register(
                                     "pricing.adultPrice.discountPrice",
-                                    { valueAsNumber: true },
+                                    {
+                                      setValueAs: (v: string) =>
+                                        v === "" ? undefined : Number(v),
+                                    },
                                   )}
                                 />
                                 <InputGroupAddon align="inline-start">
@@ -321,6 +362,11 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   }
                                 </FieldDescription>
                               )}
+                              {errors.pricing?.adultPrice?.message && (
+                                <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                  {errors.pricing.adultPrice.message}
+                                </FieldDescription>
+                              )}
                             </Field>
                           </TableCell>
                         </TableRow>
@@ -335,7 +381,10 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   placeholder="Enter price"
                                   {...register(
                                     "pricing.childPrice.originalPrice",
-                                    { valueAsNumber: true },
+                                    {
+                                      setValueAs: (v: string) =>
+                                        v === "" ? undefined : Number(v),
+                                    },
                                   )}
                                 />
                                 <InputGroupAddon align="inline-start">
@@ -365,7 +414,10 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   placeholder="Enter price"
                                   {...register(
                                     "pricing.childPrice.discountPrice",
-                                    { valueAsNumber: true },
+                                    {
+                                      setValueAs: (v: string) =>
+                                        v === "" ? undefined : Number(v),
+                                    },
                                   )}
                                 />
                                 <InputGroupAddon align="inline-start">
@@ -384,6 +436,11 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   }
                                 </FieldDescription>
                               )}
+                              {errors.pricing?.childPrice?.message && (
+                                <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                  {errors.pricing.childPrice.message}
+                                </FieldDescription>
+                              )}
                             </Field>
                           </TableCell>
                         </TableRow>
@@ -398,7 +455,10 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   placeholder="Enter price"
                                   {...register(
                                     "pricing.infantPrice.originalPrice",
-                                    { valueAsNumber: true },
+                                    {
+                                      setValueAs: (v: string) =>
+                                        v === "" ? undefined : Number(v),
+                                    },
                                   )}
                                 />
                                 <InputGroupAddon align="inline-start">
@@ -428,7 +488,10 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   placeholder="Enter price"
                                   {...register(
                                     "pricing.infantPrice.discountPrice",
-                                    { valueAsNumber: true },
+                                    {
+                                      setValueAs: (v: string) =>
+                                        v === "" ? undefined : Number(v),
+                                    },
                                   )}
                                 />
                                 <InputGroupAddon align="inline-start">
@@ -447,6 +510,11 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   }
                                 </FieldDescription>
                               )}
+                              {errors.pricing?.infantPrice?.message && (
+                                <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                  {errors.pricing.infantPrice.message}
+                                </FieldDescription>
+                              )}
                             </Field>
                           </TableCell>
                         </TableRow>
@@ -454,17 +522,17 @@ const TourDescTab = (props: TourDescTabProps) => {
                           <TableCell className="font-medium">
                             Single Supplement
                           </TableCell>
-                          <TableCell>
+                          <TableCell colSpan={2}>
                             <Field className="gap-1 col-span-4">
                               <InputGroup>
                                 <InputGroupInput
-                                  id="pricing.singleSupplement.originalPrice"
+                                  id="pricing.singleSupplement"
                                   type="number"
                                   placeholder="Enter price"
-                                  {...register(
-                                    "pricing.singleSupplement.originalPrice",
-                                    { valueAsNumber: true },
-                                  )}
+                                  {...register("pricing.singleSupplement", {
+                                    setValueAs: (v: string) =>
+                                      v === "" ? undefined : Number(v),
+                                  })}
                                 />
                                 <InputGroupAddon align="inline-start">
                                   <FontAwesomeIcon
@@ -473,46 +541,207 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   />
                                 </InputGroupAddon>
                               </InputGroup>
-                              {errors?.pricing?.singleSupplement?.originalPrice
+                              {errors.pricing?.singleSupplement?.originalPrice
                                 ?.message && (
                                 <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
                                   {
-                                    errors?.pricing?.singleSupplement
-                                      ?.originalPrice?.message
+                                    errors.pricing.singleSupplement
+                                      .originalPrice.message
                                   }
                                 </FieldDescription>
                               )}
                             </Field>
                           </TableCell>
-                          <TableCell>
-                            <Field className="gap-1 col-span-4">
-                              <InputGroup>
-                                <InputGroupInput
-                                  id="pricing.singleSupplement.discountPrice"
-                                  type="number"
-                                  placeholder="Enter price"
-                                  {...register(
-                                    "pricing.singleSupplement.discountPrice",
-                                    { valueAsNumber: true },
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+                </Card>
+              </div>
+              <div className="col-span-5">
+                <h3 className="mb-1">Service</h3>
+                <Card className="w-full p-2">
+                  <div className="rounded-lg mt-2 overflow-auto max-h-100 max-w-[100%] border border-muted shadow">
+                    <Table>
+                      <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
+                        <TableRow>
+                          <TableHead>
+                            <div className="flex items-center justify-between">
+                              <span>Include</span>
+                              <Button
+                                type="button"
+                                size="icon"
+                                onClick={() => {
+                                  const serviceInclude = getValues(
+                                    "services.includedServices",
+                                  );
+                                  setServices((prev) => ({
+                                    ...prev,
+                                    includedServices: [
+                                      ...prev.includedServices,
+                                      "",
+                                    ],
+                                  }));
+                                  serviceInclude.push("");
+                                  setValue(
+                                    "services.includedServices",
+                                    serviceInclude,
+                                  );
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faPlus} />
+                              </Button>
+                            </div>
+                          </TableHead>
+                          <TableHead>
+                            <div className="flex items-center justify-between">
+                              <span>Exclude</span>
+                              <Button
+                                type="button"
+                                size="icon"
+                                onClick={() => {
+                                  const serviceExclude = getValues(
+                                    "services.excludedServices",
+                                  );
+                                  setServices((prev) => ({
+                                    ...prev,
+                                    excludedServices: [
+                                      ...prev.excludedServices,
+                                      "",
+                                    ],
+                                  }));
+                                  serviceExclude.push("");
+                                  setValue(
+                                    "services.excludedServices",
+                                    serviceExclude,
+                                  );
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faPlus} />
+                              </Button>
+                            </div>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium align-top">
+                            {services.includedServices.map(
+                              (_: string, index: number) => (
+                                <div
+                                  className="w-full relative my-4"
+                                  key={index}
+                                >
+                                  <Field
+                                    className="gap-1 col-span-5 relative mb-2"
+                                    key={index}
+                                  >
+                                    <Textarea
+                                      id={`services.includedServices.${index}`}
+                                      placeholder="Enter include service"
+                                      className="min-h-[60px]"
+                                      {...register(
+                                        `services.includedServices[${index}]`,
+                                      )}
+                                    />
+                                  </Field>
+                                  {errors.services?.includedServices?.[index]
+                                    ?.message && (
+                                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                      {
+                                        errors.services?.includedServices?.[
+                                          index
+                                        ]?.message
+                                      }
+                                    </FieldDescription>
                                   )}
-                                />
-                                <InputGroupAddon align="inline-start">
-                                  <FontAwesomeIcon
-                                    className={"text-primary"}
-                                    icon={faMoneyBillWave}
-                                  />
-                                </InputGroupAddon>
-                              </InputGroup>
-                              {errors?.pricing?.singleSupplement?.discountPrice
-                                ?.message && (
-                                <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
-                                  {
-                                    errors?.pricing?.singleSupplement
-                                      ?.discountPrice?.message
-                                  }
-                                </FieldDescription>
-                              )}
-                            </Field>
+                                  <Button
+                                    className="rounded-full cursor-pointer md:h-6 md:w-6 h-4 w-4
+                                                        absolute md:top-[-8px] md:right-[-8px] top-1 right-1 z-10"
+                                    size={"sm"}
+                                    variant={"destructive"}
+                                    type="button"
+                                    onClick={() =>
+                                      setServices((prev) => {
+                                        const newIncludedServices = [
+                                          ...prev.includedServices,
+                                        ];
+                                        newIncludedServices.splice(index, 1);
+                                        setValue(
+                                          "services.includedServices",
+                                          newIncludedServices,
+                                        );
+                                        return {
+                                          ...prev,
+                                          includedServices: newIncludedServices,
+                                        };
+                                      })
+                                    }
+                                  >
+                                    <FontAwesomeIcon size="sm" icon={faXmark} />
+                                  </Button>
+                                </div>
+                              ),
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium align-top">
+                            {services.excludedServices.map(
+                              (_: string, index: number) => (
+                                <div
+                                  className="w-full relative my-4"
+                                  key={index}
+                                >
+                                  <Field
+                                    className="gap-1 col-span-5 relative mb-2"
+                                    key={index}
+                                  >
+                                    <Textarea
+                                      id={`services.excludedServices.${index}`}
+                                      placeholder="Enter exclude service"
+                                      className="min-h-[60px]"
+                                      {...register(
+                                        `services.excludedServices[${index}]`,
+                                      )}
+                                    />
+                                  </Field>
+                                  {errors.services?.excludedServices?.[index]
+                                    ?.message && (
+                                    <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
+                                      {
+                                        errors.services?.excludedServices?.[
+                                          index
+                                        ]?.message
+                                      }
+                                    </FieldDescription>
+                                  )}
+                                  <Button
+                                    className="rounded-full cursor-pointer md:h-6 md:w-6 h-4 w-4
+                                                        absolute md:top-[-8px] md:right-[-8px] top-1 right-1 z-10"
+                                    size={"sm"}
+                                    variant={"destructive"}
+                                    type="button"
+                                    onClick={() =>
+                                      setServices((prev) => {
+                                        const newExcludedServices = [
+                                          ...prev.excludedServices,
+                                        ];
+                                        newExcludedServices.splice(index, 1);
+                                        setValue(
+                                          "services.excludedServices",
+                                          newExcludedServices,
+                                        );
+                                        return {
+                                          ...prev,
+                                          excludedServices: newExcludedServices,
+                                        };
+                                      })
+                                    }
+                                  >
+                                    <FontAwesomeIcon size="sm" icon={faXmark} />
+                                  </Button>
+                                </div>
+                              ),
+                            )}
                           </TableCell>
                         </TableRow>
                       </TableBody>

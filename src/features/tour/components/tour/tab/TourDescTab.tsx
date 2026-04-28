@@ -20,6 +20,7 @@ import { FieldDescription } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import TinyMCE from "@/components/shared/TinyMCE";
 
 type TourDescTabProps = {
   register: any;
@@ -92,23 +93,22 @@ const TourDescTab = (props: TourDescTabProps) => {
               </div>
 
               <Field className="gap-1 col-span-5">
-                <FieldLabel htmlFor="description">Summary</FieldLabel>
+                <FieldLabel htmlFor="summary">Summary</FieldLabel>
                 <Textarea
-                  id="description"
+                  id="summary"
                   placeholder="Enter summary"
                   className="min-h-[120px]"
-                  {...register("description")}
+                  {...register("summary")}
                 />
               </Field>
-              <Field className="gap-1 col-span-5">
-                <FieldLabel htmlFor="description">Description</FieldLabel>
-                <Textarea
-                  id="description"
-                  placeholder="Enter description"
-                  className="min-h-[120px]"
-                  {...register("description")}
+              <div className="col-span-5">
+                <h3>Description</h3>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => <TinyMCE field={field} />}
                 />
-              </Field>
+              </div>
             </div>
           </CardContent>
         </Card>

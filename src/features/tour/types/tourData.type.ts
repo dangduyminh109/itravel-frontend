@@ -36,7 +36,7 @@ export interface UpdateTourData {
 
 export interface TicketPriceData {
   originalPrice: number;
-  discountPrice: number;
+  discountPrice: number | null;
 }
 
 export interface PricingData {
@@ -79,5 +79,13 @@ export interface ScheduleData {
   totalSeats: number;
   surcharge: number;
   pricing: PricingData;
-  status: "OPEN" | "FULL" | "CANCELLED" | "COMPLETED";
+  status: scheduleStatus;
+}
+
+export enum scheduleStatus {
+  UPCOMING = "UPCOMING",
+  OPEN = "OPEN",
+  FULL = "FULL",
+  CANCELLED = "CANCELLED",
+  COMPLETED = "COMPLETED",
 }

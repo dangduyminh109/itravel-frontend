@@ -29,6 +29,7 @@ export default function RootLayout({
           `,
           }}
         />
+        <title>iTravel Admin</title>
       </head>
       <body className="bg-background text-foreground antialiased font-sans">
         <TooltipProvider>{children}</TooltipProvider>
