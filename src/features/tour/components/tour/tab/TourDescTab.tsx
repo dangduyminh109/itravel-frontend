@@ -36,7 +36,7 @@ const TourDescTab = (props: TourDescTabProps) => {
       <TabsContent value="tourDesc">
         <Card defaultValue="preview">
           <CardHeader className="p-4">
-            <CardTitle>Tour Information</CardTitle>
+            <CardTitle>Tour Description</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground p-4 pt-0">
             <div className="grid grid-cols-5 gap-3 p-2 rounded-md border-2 border-primary">

@@ -1,7 +1,7 @@
 import { apiClient } from "@/lib/apiClient";
 import ApiResponse, { PagingResponse } from "@/types/ApiResponse.type";
 import { CreateTourData, UpdateTourData } from "../types/tourData.type";
-import { Tour, TourDetail } from "../types/tour.type";
+import { Tour, TourDetail, TourFullInfo } from "../types/tour.type";
 import { formatDate } from "@/lib/utils";
 // import { TourGeneralInfo } from "../types/tourGeneralInfo.type";
 
@@ -34,8 +34,8 @@ export async function getTours({
   return result;
 }
 
-export async function getTour(id: number): Promise<ApiResponse<TourDetail>> {
-  const result = await apiClient<TourDetail>(`/tour/${id}`, {
+export async function getTour(id: string): Promise<ApiResponse<TourFullInfo>> {
+  const result = await apiClient<TourFullInfo>(`/tour/${id}`, {
     method: "GET",
   });
   return result;
@@ -128,11 +128,11 @@ export async function createTour(
   }
 
   if (tourData.services) {
-    tourData.services.includedServices.forEach((service, index) => {
-      data.append(`services.includedServices[${index}]`, service);
+    tourData.services.includes.forEach((service, index) => {
+      data.append(`services.includes[${index}]`, service);
     });
-    tourData.services.excludedServices.forEach((service, index) => {
-      data.append(`services.excludedServices[${index}]`, service);
+    tourData.services.excludes.forEach((service, index) => {
+      data.append(`services.excludes[${index}]`, service);
     });
   }
   if (tourData.departureLocationId) {
@@ -326,11 +326,11 @@ export async function updateTour(
   }
 
   if (tourData.services) {
-    tourData.services.includedServices.forEach((service, index) => {
-      data.append(`services.includedServices[${index}]`, service);
+    tourData.services.includes.forEach((service, index) => {
+      data.append(`services.includes[${index}]`, service);
     });
-    tourData.services.excludedServices.forEach((service, index) => {
-      data.append(`services.excludedServices[${index}]`, service);
+    tourData.services.excludes.forEach((service, index) => {
+      data.append(`services.excludes[${index}]`, service);
     });
   }
   if (tourData.departureLocationId) {
@@ -365,7 +365,10 @@ export async function updateTour(
     if (schedule.departureDate) {
       data.append(
         `schedules[${index}].departureDate`,
-        schedule.departureDate.toISOString(),
+        formatDate({
+          dateString: schedule.departureDate.toISOString(),
+          type: "datetime",
+        }),
       );
     }
     if (schedule.totalSeats) {
@@ -420,8 +423,6 @@ export async function updateTour(
   tourData.tourImages.forEach((image, index) => {
     if (image.image) {
       data.append(`tourImages[${index}].image`, image.image);
-    }
-    if (image.isThumbnail) {
       data.append(
         `tourImages[${index}].isThumbnail`,
         image.isThumbnail.toString(),
@@ -432,13 +433,9 @@ export async function updateTour(
   tourData.removedImageUrls.forEach((url, index) => {
     data.append(`removedImageUrls[${index}]`, url);
   });
-
   const result = await apiClient<TourDetail>(`/tour/${tourData.id}`, {
     method: "PUT",
     body: data,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   });
   return result;
 }

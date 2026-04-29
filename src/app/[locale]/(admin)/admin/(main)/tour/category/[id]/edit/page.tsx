@@ -25,8 +25,7 @@ import {
   getCategory,
   updateCategory,
 } from "@/features/tour/services/category.service";
-import { useEffect, useState } from "react";
-import { Category } from "@/features/tour/types/category.type";
+import { useEffect } from "react";
 
 type updateCategorySchema = z.infer<typeof updateCategorySchema>;
 

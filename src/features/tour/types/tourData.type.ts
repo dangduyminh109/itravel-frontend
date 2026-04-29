@@ -16,7 +16,7 @@ export interface CreateTourData {
 }
 
 export interface UpdateTourData {
-  id: number;
+  id: string;
   name: string;
   summary?: string;
   description?: string;
@@ -58,8 +58,8 @@ export interface ParticipantLimitData {
 }
 
 export interface ServicesData {
-  includedServices: string[];
-  excludedServices: string[];
+  includes: string[];
+  excludes: string[];
 }
 export interface ItineraryData {
   dayNumber: number;
@@ -79,13 +79,12 @@ export interface ScheduleData {
   totalSeats: number;
   surcharge: number;
   pricing: PricingData;
-  status: scheduleStatus;
+  status: ScheduleStatus;
 }
 
-export enum scheduleStatus {
-  UPCOMING = "UPCOMING",
-  OPEN = "OPEN",
-  FULL = "FULL",
-  CANCELLED = "CANCELLED",
-  COMPLETED = "COMPLETED",
-}
+export type ScheduleStatus =
+  | "UPCOMING"
+  | "OPEN"
+  | "FULL"
+  | "CANCELLED"
+  | "COMPLETED";

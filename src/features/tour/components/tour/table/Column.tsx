@@ -51,7 +51,11 @@ export const columns: ColumnDef<Tour>[] = [
       const status = row.getValue<"ACTIVE" | "INACTIVE" | "DRAFT">("status");
       switch (status) {
         case "DRAFT":
-          return <Badge className="bg-muted">{status}</Badge>;
+          return (
+            <Badge className="bg-muted hover:bg-muted text-primary">
+              {status}
+            </Badge>
+          );
         case "INACTIVE":
           return (
             <Badge className="bg-[var(--warning)] hover:bg-[var(--warning)]">

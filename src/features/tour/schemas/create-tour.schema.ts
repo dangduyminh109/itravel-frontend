@@ -1,64 +1,6 @@
 import { z } from "zod";
-
-const priceSchema = z
-  .object({
-    originalPrice: z
-      .number({ message: "Giá gốc phải được cung cấp" })
-      .min(0, { message: "Giá gốc phải lớn hơn hoặc bằng 0" }),
-    discountPrice: z
-      .number()
-      .min(0, { message: "Giá giảm phải lớn hơn hoặc bằng 0" })
-      .optional()
-      .or(z.literal("")),
-  })
-  .refine(
-    (data) => {
-      if (data.discountPrice === "" || data.discountPrice === undefined) {
-        return true;
-      }
-      return data.discountPrice < data.originalPrice;
-    },
-    {
-      message: "Giá giảm phải nhỏ hơn giá gốc",
-    },
-  );
-
-const pricingSchema = z.object({
-  adultPrice: priceSchema,
-  childPrice: priceSchema,
-  infantPrice: priceSchema,
-  singleSupplement: z
-    .number({ message: "Giá phụ thu phòng đơn phải được cung cấp" })
-    .min(0, { message: "Giá phụ thu phòng đơn phải lớn hơn hoặc bằng 0" }),
-  currency: z.enum(["VND", "USD"], {
-    message: "Đơn vị tiền tệ phải là VND hoặc USD",
-  }),
-});
-
-export const scheduleItemSchema = z.object({
-  departureDate: z
-    .string({
-      message: "Ngày khởi hành phải được cung cấp",
-    })
-    .refine((date) => !isNaN(Date.parse(date)), {
-      message: "Ngày khởi hành không hợp lệ",
-    })
-    .refine((date) => new Date(date) >= new Date(), {
-      message: "Ngày khởi hành phải ở hiện tại hoặc tương lai",
-    }),
-  totalSeats: z
-    .number({ message: "Tổng số chỗ phải được cung cấp" })
-    .min(1, { message: "Tổng số chỗ phải lớn hơn hoặc bằng 1" }),
-  surcharge: z
-    .number()
-    .min(0, { message: "Phụ phí phải lớn hơn hoặc bằng 0" })
-    .optional()
-    .or(z.literal("")),
-  pricing: pricingSchema,
-  status: z.string().regex(/^(UPCOMING|OPEN|FULL|CANCELLED|COMPLETED)$/, {
-    message: "Trạng thái không hợp lệ",
-  }),
-});
+import { pricingSchema } from "./pricing.schema";
+import { scheduleItemSchema } from "./schedule.schema";
 
 export const createTourSchema = z.object({
   name: z.string().min(1, { message: "Tên không được để trống" }),
@@ -96,12 +38,12 @@ export const createTourSchema = z.object({
       },
     ),
   services: z.object({
-    includedServices: z
+    includes: z
       .array(
         z.string().min(1, { message: "Dịch vụ bao gồm không được để trống" }),
       )
       .optional(),
-    excludedServices: z
+    excludes: z
       .array(
         z
           .string()

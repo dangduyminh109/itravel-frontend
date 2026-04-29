@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createTourSchema } from "@/features/tour/schemas/create-tour.schema";
 import { getLocationTree } from "@/features/location/services/location.service";
 import { Location } from "@/features/location/types/location.type";
 import { Tabs, TabsTrigger } from "@/components/ui/tabs";
@@ -23,32 +22,36 @@ import { Category } from "@/features/tour/types/category.type";
 import TourDescTab from "@/features/tour/components/tour/tab/TourDescTab";
 import TourDetailTab from "@/features/tour/components/tour/tab/TourDetailTab";
 import TourItineraryTab from "@/features/tour/components/tour/tab/TourItineraryTab";
-import TourScheduleTab from "@/features/tour/components/tour/tab/TourScheduleTab";
 import TourImageTab from "@/features/tour/components/tour/tab/TourImageTab";
 import {
-  CreateTourData,
+  UpdateTourData,
   ScheduleData,
-  ScheduleStatus,
   TourImageData,
+  ScheduleStatus,
 } from "@/features/tour/types/tourData.type";
-import { createTour } from "@/features/tour/services/tour.service";
+import { getTour, updateTour } from "@/features/tour/services/tour.service";
+import { useParams } from "next/dist/client/components/navigation";
+import { updateTourSchema } from "@/features/tour/schemas/update-tour.schema";
+import { getSchedules } from "@/features/tour/services/schedule.service";
+import TourScheduleUpdateTab from "@/features/tour/components/tour/tab/TourScheduleUpdateTab";
 import { useLoadingStore } from "@/store/loading.store";
-type createTourSchema = z.infer<typeof createTourSchema>;
+type updateTourSchema = z.infer<typeof updateTourSchema>;
 
 const page = () => {
+  const { id } = useParams<{ id: string }>();
   const breadcrumbData = {
-    title: "Create Tour",
+    title: "Edit Tour",
     listBreadcrumb: [
       { name: "Dashboard", href: "/admin/dashboard" },
       { name: "Tour", href: "/admin/tour" },
-      { name: "Create Tour", href: "/admin/tour/create" },
+      { name: "Edit Tour", href: `/admin/tour/${id}/edit` },
     ],
   };
+
   const [flatLocations, setFlatLocations] = useState<
     { id: number; name: string; type: string; depth: number }[]
   >([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [tabError, setTabError] = useState({
     tourDesc: false,
     detail: false,
@@ -56,6 +59,8 @@ const page = () => {
     schedule: false,
     image: false,
   });
+  const { isLoading, setLoading } = useLoadingStore();
+
   const {
     register,
     handleSubmit,
@@ -64,22 +69,22 @@ const page = () => {
     getValues,
     watch,
     formState: { errors },
-  } = useForm<createTourSchema>({
-    resolver: zodResolver(createTourSchema),
+  } = useForm<updateTourSchema>({
+    resolver: zodResolver(updateTourSchema),
     defaultValues: {
       status: "ACTIVE",
       pricing: {
         adultPrice: {
           originalPrice: undefined,
-          discountPrice: undefined,
+          discountPrice: null,
         },
         childPrice: {
           originalPrice: undefined,
-          discountPrice: undefined,
+          discountPrice: null,
         },
         infantPrice: {
           originalPrice: undefined,
-          discountPrice: undefined,
+          discountPrice: null,
         },
         singleSupplement: 0,
         currency: "VND",
@@ -117,13 +122,21 @@ const page = () => {
     thumbnailImage: null,
     imageList: [],
   });
-  const { isLoading, setLoading } = useLoadingStore();
+  const [tourImageUrl, setTourImageUrl] = useState<{
+    thumbnailImage: string | null;
+    imageList: string[];
+  }>({
+    thumbnailImage: null,
+    imageList: [],
+  });
+
+  const [removedImageUrls, setRemovedImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchData() {
-      setIsLoadingLocation(true);
+      setLoading(true);
       try {
-        const [locationTree, categories] = await Promise.all([
+        const [locationTree, categories, tour, schedules] = await Promise.all([
           getLocationTree("ACTIVE"),
           getCategories({
             status: "ACTIVE",
@@ -131,7 +144,91 @@ const page = () => {
             page: 0,
             size: 100,
           }),
+          getTour(id),
+          getSchedules({ tourId: id }),
         ]);
+        if (tour.success) {
+          const tourData = tour.response;
+          setValue("name", tourData.name);
+          setValue("summary", tourData.summary);
+          setValue("description", tourData.description);
+          setValue("status", tourData.status);
+          setValue("pricing", {
+            adultPrice: {
+              originalPrice: tourData.pricing.adultPrice.originalPrice,
+              discountPrice: tourData.pricing.adultPrice.discountPrice || null,
+            },
+            childPrice: {
+              originalPrice: tourData.pricing.childPrice.originalPrice,
+              discountPrice: tourData.pricing.childPrice.discountPrice || null,
+            },
+            infantPrice: {
+              originalPrice: tourData.pricing.infantPrice.originalPrice,
+              discountPrice: tourData.pricing.infantPrice.discountPrice || null,
+            },
+            singleSupplement: tourData.pricing.singleSupplement,
+            currency: (tourData.pricing.currency as "VND" | "USD") || "VND",
+          });
+          setValue("duration", tourData.duration);
+          setValue("participantLimit", tourData.participantLimit);
+          setValue("services", tourData.services);
+          setValue("categoryId", tourData.categoryId);
+          setValue("departureLocationId", tourData.departureLocationId);
+          setValue("destinationLocationId", tourData.destinationLocationId);
+          setValue("itineraries", tourData.itineraries);
+          setTourImageUrl({
+            thumbnailImage:
+              tourData.tourImages.find((img) => img.isThumbnail)?.imageUrl ||
+              tourData.tourImages[0]?.imageUrl ||
+              null,
+            imageList: tourData.tourImages
+              .filter((img) => !img.isThumbnail)
+              .map((img) => img.imageUrl),
+          });
+        } else {
+          toast.error(
+            "Failed to fetch tour! Please reload the page and try again.",
+          );
+        }
+
+        if (schedules.success) {
+          const scheduleData = schedules.response.data || [];
+          setValue("schedules", [
+            ...scheduleData.map((schedule) => ({
+              id: schedule.id,
+              departureDate: new Date(schedule.departureDate)
+                .toISOString()
+                .split("T")[0],
+              totalSeats: schedule.totalSeats,
+              surcharge: schedule.surcharge,
+              status: schedule.status as string,
+              pricing: {
+                adultPrice: {
+                  originalPrice: schedule.pricing.adultPrice.originalPrice,
+                  discountPrice:
+                    schedule.pricing.adultPrice.discountPrice || null,
+                },
+                childPrice: {
+                  originalPrice: schedule.pricing.childPrice.originalPrice,
+                  discountPrice:
+                    schedule.pricing.childPrice.discountPrice || null,
+                },
+                infantPrice: {
+                  originalPrice: schedule.pricing.infantPrice.originalPrice,
+                  discountPrice:
+                    schedule.pricing.infantPrice.discountPrice || null,
+                },
+                singleSupplement: schedule.pricing.singleSupplement || 0,
+                currency: (schedule.pricing.currency as "VND" | "USD") || "VND",
+              },
+            })),
+          ]);
+        } else {
+          toast.error(
+            "Failed to fetch schedules! Please reload the page and try again.",
+          );
+        }
+
         if (locationTree.success) {
           const flattened: {
             id: number;
@@ -171,13 +268,13 @@ const page = () => {
           "Failed to fetch location or categories! Please reload the page and try again.",
         );
       } finally {
-        setIsLoadingLocation(false);
+        setLoading(false);
       }
     }
     fetchData();
   }, []);
 
-  const onSubmit = async (data: createTourSchema) => {
+  const onSubmit = async (data: updateTourSchema) => {
     const tourImages: TourImageData[] = tourImage.imageList.map(
       (file: File) => ({
         image: file,
@@ -191,6 +288,7 @@ const page = () => {
       });
     }
     const schedules: ScheduleData[] = data.schedules.map((schedule) => ({
+      id: schedule.id ? schedule.id : undefined,
       departureDate: new Date(schedule.departureDate),
       totalSeats: schedule.totalSeats,
       surcharge: schedule.surcharge || 0,
@@ -213,11 +311,13 @@ const page = () => {
       },
     }));
 
-    const tourData: CreateTourData = {
+    const tourData: UpdateTourData = {
+      id: id,
       name: data.name,
       summary: data.summary,
       description: data.description,
       status: data.status,
+      removedImageUrls: removedImageUrls || [],
       pricing: {
         adultPrice: {
           originalPrice: data.pricing.adultPrice.originalPrice,
@@ -248,11 +348,11 @@ const page = () => {
       tourImages: tourImages,
     };
     setLoading(true);
-    const result = await createTour(tourData);
+    const result = await updateTour(tourData);
     if (result.success) {
-      toast.success(result.message || "Tour created successfully!");
+      toast.success(result.message || "Tour updated successfully!");
     } else {
-      toast.error(result.message || "Failed to create tour.");
+      toast.error(result.message || "Failed to update tour.");
     }
     setLoading(false);
   };
@@ -288,71 +388,73 @@ const page = () => {
   return (
     <div className="w-full">
       <CustomBreadcrumb {...breadcrumbData} />
-      <form className="mt-2" onSubmit={handleSubmit(onSubmit, onError)}>
-        <Tabs
-          value={tab}
-          onValueChange={setTab}
+      <Tabs
+        value={tab}
+        onValueChange={setTab}
+        defaultValue="tourDesc"
+        className="w-full mt-2"
+      >
+        <TabsList
           defaultValue="tourDesc"
-          className="w-full mt-2"
+          className="bg-primary flex justify-center gap-2 px-1 py-2 rounded-lg overflow-hidden text-white"
         >
-          <TabsList
-            defaultValue="tourDesc"
-            className="bg-primary flex justify-center px-1 py-2 rounded-lg overflow-hidden text-center text-white"
-          >
-            <div className="bg-secondary rounded-md p-1">
-              <TabsTrigger
-                value="tourDesc"
-                className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
-              >
-                <FontAwesomeIcon className="mr-1" icon={faMap} />
-                Tour Description
-                {tabError.tourDesc && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="detail"
-                className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
-              >
-                <FontAwesomeIcon className="mr-1" icon={faCircleInfo} />
-                Detail
-                {tabError.detail && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="itinerary"
-                className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
-              >
-                <FontAwesomeIcon className="mr-1" icon={faRoute} />
-                Itinerary
-                {tabError.itinerary && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="schedule"
-                className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
-              >
-                <FontAwesomeIcon className="mr-1" icon={faCalendarDays} />
-                Schedule
-                {tabError.schedule && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="image"
-                className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
-              >
-                <FontAwesomeIcon className="mr-1" icon={faImages} />
-                Image
-                {tabError.image && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </TabsTrigger>
-            </div>
-          </TabsList>
+          <div className="bg-secondary rounded-md p-1">
+            <TabsTrigger
+              value="tourDesc"
+              className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
+            >
+              <FontAwesomeIcon className="mr-1" icon={faMap} />
+              Tour Description
+              {tabError.tourDesc && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              value="detail"
+              className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
+            >
+              <FontAwesomeIcon className="mr-1" icon={faCircleInfo} />
+              Detail
+              {tabError.detail && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              value="itinerary"
+              className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
+            >
+              <FontAwesomeIcon className="mr-1" icon={faRoute} />
+              Itinerary
+              {tabError.itinerary && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </TabsTrigger>
 
+            <TabsTrigger
+              value="image"
+              className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
+            >
+              <FontAwesomeIcon className="mr-1" icon={faImages} />
+              Image
+              {tabError.image && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </TabsTrigger>
+          </div>
+          <div className="bg-secondary rounded-md p-1">
+            <TabsTrigger
+              value="schedule"
+              className="mx-2 relative cursor-pointer data-[state=active]:bg-white data-[state=active]:text-primary hover:bg-white hover:text-primary"
+            >
+              <FontAwesomeIcon className="mr-1" icon={faCalendarDays} />
+              Schedule
+              {tabError.schedule && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </TabsTrigger>
+          </div>
+        </TabsList>
+        <form className="mt-2" onSubmit={handleSubmit(onSubmit, onError)}>
           {tab === "tourDesc" && (
             <TourDescTab
               register={register}
@@ -360,7 +462,7 @@ const page = () => {
               errors={errors}
             />
           )}
-          {tab === "detail" && !isLoadingLocation && (
+          {tab === "detail" && !isLoading && (
             <TourDetailTab
               register={register}
               control={control}
@@ -382,23 +484,28 @@ const page = () => {
               itinerary={itinerary}
             />
           )}
-          {tab === "schedule" && (
-            <TourScheduleTab
-              setValue={setValue}
-              getValues={getValues}
-              errors={errors}
-            />
-          )}
 
           {tab === "image" && (
             <TourImageTab
               isLoading={isLoading}
+              isUpdate={{
+                tourImageUrl,
+                setTourImageUrl,
+                setRemovedImageUrls,
+              }}
               tourImage={tourImage}
               setTourImage={setTourImage}
             />
           )}
-        </Tabs>
-      </form>
+        </form>
+        {tab === "schedule" && (
+          <TourScheduleUpdateTab
+            getValues={getValues}
+            errors={errors}
+            tourId={id}
+          />
+        )}
+      </Tabs>
     </div>
   );
 };

@@ -6,13 +6,26 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/dist/client/components/navigation";
 import { toast } from "sonner";
 
 type TourImageTabProps = {
   isLoading: boolean;
+  isUpdate?: {
+    tourImageUrl: {
+      thumbnailImage: string | null;
+      imageList: string[];
+    };
+    setRemovedImageUrls: React.Dispatch<React.SetStateAction<string[]>>;
+    setTourImageUrl: React.Dispatch<
+      React.SetStateAction<{
+        thumbnailImage: string | null;
+        imageList: string[];
+      }>
+    >;
+  };
   tourImage: {
     thumbnailImage: File | null;
     imageList: File[];
@@ -26,7 +39,7 @@ type TourImageTabProps = {
 };
 
 const TourImageTab = (props: TourImageTabProps) => {
-  const { isLoading, tourImage, setTourImage } = props;
+  const { isLoading, isUpdate, tourImage, setTourImage } = props;
   const router = useRouter();
   const imagesRef = useRef<HTMLInputElement>(null);
   function handleChangeThumbnailImage(e: React.ChangeEvent<HTMLInputElement>) {
@@ -43,7 +56,12 @@ const TourImageTab = (props: TourImageTabProps) => {
     const files = e.target.files;
 
     if (files) {
-      if (files.length + tourImage.imageList.length > 15) {
+      if (
+        files.length +
+          tourImage.imageList.length +
+          (isUpdate ? isUpdate.tourImageUrl.imageList.length : 0) >
+        15
+      ) {
         toast.error("You can only upload up to 15 images");
         e.target.value = "";
         return;
@@ -69,6 +87,21 @@ const TourImageTab = (props: TourImageTabProps) => {
     });
   }
 
+  function handleRemoveImageUrl(index: number) {
+    isUpdate?.setTourImageUrl((prev) => {
+      const newImageList = [...prev.imageList];
+      newImageList.splice(index, 1);
+      return {
+        ...prev,
+        imageList: newImageList,
+      };
+    });
+    isUpdate?.setRemovedImageUrls((prev) => [
+      ...prev,
+      isUpdate.tourImageUrl.imageList[index],
+    ]);
+  }
+
   return (
     <div>
       <TabsContent value="image">
@@ -85,7 +118,8 @@ const TourImageTab = (props: TourImageTabProps) => {
                   id="thumbnailImage"
                   onChange={handleChangeThumbnailImage}
                 />
-                {tourImage.thumbnailImage ? (
+                {tourImage.thumbnailImage ||
+                (isUpdate && isUpdate.tourImageUrl.thumbnailImage) ? (
                   <Card className="relative w-full h-full rounded-xl overflow-hidden">
                     <Button
                       className="rounded-full cursor-pointer md:h-6 md:w-6 h-4 w-4
@@ -93,18 +127,36 @@ const TourImageTab = (props: TourImageTabProps) => {
                       size={"sm"}
                       variant={"destructive"}
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
+                        if (isUpdate) {
+                          if (isUpdate.tourImageUrl.thumbnailImage) {
+                            isUpdate.setRemovedImageUrls((prev) => [
+                              ...prev,
+                              isUpdate.tourImageUrl.thumbnailImage!,
+                            ]);
+                          }
+                          isUpdate.setTourImageUrl((prev) => ({
+                            ...prev,
+                            thumbnailImage: null,
+                          }));
+                        }
                         setTourImage((prev) => ({
                           ...prev,
                           thumbnailImage: null,
-                        }))
-                      }
+                        }));
+                      }}
                     >
                       <FontAwesomeIcon size="sm" icon={faXmark} />
                     </Button>
                     <img
                       className="h-full w-full object-cover"
-                      src={URL.createObjectURL(tourImage.thumbnailImage)}
+                      src={
+                        tourImage.thumbnailImage
+                          ? URL.createObjectURL(tourImage.thumbnailImage)
+                          : isUpdate && isUpdate.tourImageUrl.thumbnailImage
+                            ? isUpdate.tourImageUrl.thumbnailImage
+                            : ""
+                      }
                       alt="tour-image"
                     />
                   </Card>
@@ -129,7 +181,9 @@ const TourImageTab = (props: TourImageTabProps) => {
                   id="tourImages"
                   onChange={handleChangeTourImage}
                 />
-                {tourImage.imageList.length < 15 && (
+                {tourImage.imageList.length +
+                  (isUpdate ? isUpdate.tourImageUrl.imageList.length : 0) <
+                  15 && (
                   <div className="col-span-1 row-span-1">
                     <label
                       htmlFor="tourImages"
@@ -142,6 +196,31 @@ const TourImageTab = (props: TourImageTabProps) => {
                     </label>
                   </div>
                 )}
+                {isUpdate &&
+                  isUpdate.tourImageUrl.imageList.map((imageUrl, index) => (
+                    <Card
+                      key={index}
+                      className="relative aspect-square col-span-1 row-span-1 rounded-xl overflow-hidden"
+                    >
+                      <Button
+                        className="rounded-full cursor-pointer md:h-6 md:w-6 h-4 w-4
+                      absolute md:top-2 md:right-2 top-1 right-1 z-10"
+                        size={"sm"}
+                        variant={"destructive"}
+                        type="button"
+                        onClick={() => {
+                          handleRemoveImageUrl(index);
+                        }}
+                      >
+                        <FontAwesomeIcon size="sm" icon={faXmark} />
+                      </Button>
+                      <img
+                        src={imageUrl}
+                        alt="tour-image"
+                        className="w-full h-full object-cover"
+                      />
+                    </Card>
+                  ))}
                 {tourImage.imageList?.map((file, index) => (
                   <Card
                     key={index}
@@ -180,7 +259,7 @@ const TourImageTab = (props: TourImageTabProps) => {
             Back
           </Button>
           <Button type="submit" className="cursor-pointer" disabled={isLoading}>
-            Create Tour
+            {isUpdate ? "Update Tour" : "Create Tour"}
           </Button>
         </div>
       </TabsContent>

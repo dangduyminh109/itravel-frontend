@@ -18,28 +18,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FieldDescription } from "@/components/ui/field";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
 import { Calendar } from "@/components/ui/calendar";
-
-type TourScheduleTabProps = {
-  setValue: any;
-  getValues: any;
-  errors: any;
-};
-
 import { z } from "zod";
 import { scheduleItemSchema } from "@/features/tour/schemas/schedule.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -49,23 +33,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import ScheduleTable from "../table/ScheduleTable";
+import {
+  createSchedule,
+  deleteSchedule,
+  updateSchedule,
+} from "@/features/tour/services/schedule.service";
+import {
+  CreateScheduleData,
+  UpdateScheduleData,
+} from "@/features/tour/types/scheduleData.type";
+import { ScheduleStatus } from "@/features/tour/types/tourData.type";
 import { Input } from "@/components/ui/input";
-import { formatDate } from "@/lib/utils";
 import { useLoadingStore } from "@/store/loading.store";
+
 type scheduleItemSchema = z.infer<typeof scheduleItemSchema>;
 
-const TourScheduleTab = (props: TourScheduleTabProps) => {
-  const {
-    setValue: setTourValue,
-    getValues: getTourValues,
-    errors: tourErrors,
-  } = props;
+type TourScheduleTabProps = {
+  getValues: any;
+  errors: any;
+  tourId: string;
+};
+
+const TourScheduleUpdateTab = (props: TourScheduleTabProps) => {
+  const { tourId, getValues: getTourValues, errors: tourErrors } = props;
   const [isUpdate, setIsUpdate] = useState<number | null>(null);
-  const { isLoading, setLoading } = useLoadingStore();
+  const { setLoading } = useLoadingStore();
   const {
     register,
     control,
     getValues,
+    setValue,
+    watch,
     trigger,
     reset,
     formState: { errors },
@@ -83,21 +82,24 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
             Number(getTourValues("pricing.adultPrice.originalPrice")) ||
             undefined,
           discountPrice:
-            Number(getTourValues("pricing.adultPrice.discountPrice")) || null,
+            Number(getTourValues("pricing.adultPrice.discountPrice")) ||
+            undefined,
         },
         childPrice: {
           originalPrice:
             Number(getTourValues("pricing.childPrice.originalPrice")) ||
             undefined,
           discountPrice:
-            Number(getTourValues("pricing.childPrice.discountPrice")) || null,
+            Number(getTourValues("pricing.childPrice.discountPrice")) ||
+            undefined,
         },
         infantPrice: {
           originalPrice:
             Number(getTourValues("pricing.infantPrice.originalPrice")) ||
             undefined,
           discountPrice:
-            Number(getTourValues("pricing.infantPrice.discountPrice")) || null,
+            Number(getTourValues("pricing.infantPrice.discountPrice")) ||
+            undefined,
         },
         singleSupplement:
           Number(getTourValues("pricing.singleSupplement")) || 0,
@@ -111,56 +113,107 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
     reset();
   };
 
-  const onDelete = () => {
-    const updatedSchedules = [...(getTourValues("schedules") || [])];
-    updatedSchedules.splice(Number(isUpdate), 1);
-    setTourValue("schedules", updatedSchedules);
-    setIsUpdate(null);
-    reset();
+  const onDelete = async () => {
+    setLoading(true);
+    const result = await deleteSchedule(isUpdate!);
+    if (result.success) {
+      toast.success("Schedule deleted successfully");
+      setIsUpdate(null);
+      reset();
+    }
+    setLoading(false);
   };
 
   const onSubmit = async () => {
     const isValid = await trigger();
     if (isValid) {
+      const data = getValues();
+      if (data.totalSeats < minParticipants) {
+        toast.error(
+          `Total seats must be greater than or equal to minimum participants (${minParticipants})`,
+        );
+        return;
+      }
       setLoading(true);
       try {
-        const data = getValues();
-        if (data.totalSeats < minParticipants) {
-          toast.error(
-            `Total seats must be greater than or equal to minimum participants (${minParticipants})`,
-          );
-          return;
-        }
-        if (isUpdate != null) {
-          const updatedSchedules = [...(getTourValues("schedules") || [])];
-          updatedSchedules[isUpdate] = data;
-          setTourValue("schedules", updatedSchedules);
-          setIsUpdate(null);
-          reset();
+        if (data.id) {
+          const scheduleData: UpdateScheduleData = {
+            id: data.id,
+            departureDate: new Date(data.departureDate),
+            totalSeats: data.totalSeats,
+            surcharge: data.surcharge,
+            status: data.status as ScheduleStatus,
+            pricing: {
+              adultPrice: {
+                originalPrice: data.pricing.adultPrice.originalPrice,
+                discountPrice: data.pricing.adultPrice.discountPrice || null,
+              },
+              childPrice: {
+                originalPrice: data.pricing.childPrice.originalPrice,
+                discountPrice: data.pricing.childPrice.discountPrice || null,
+              },
+              infantPrice: {
+                originalPrice: data.pricing.infantPrice.originalPrice,
+                discountPrice: data.pricing.infantPrice.discountPrice || null,
+              },
+              singleSupplement: data.pricing.singleSupplement || 0,
+              currency: data.pricing.currency,
+            },
+          };
+          const result = await updateSchedule(scheduleData);
+          if (result.success) {
+            toast.success("Schedule updated successfully");
+            setIsUpdate(null);
+            reset();
+          } else {
+            toast.error(result.message || "Failed to update schedule");
+          }
         } else {
-          setTourValue("schedules", [
-            data,
-            ...(getTourValues("schedules") || []),
-          ]);
-          reset();
+          const scheduleData: CreateScheduleData = {
+            departureDate: new Date(data.departureDate),
+            totalSeats: data.totalSeats,
+            surcharge: data.surcharge,
+            status: data.status as ScheduleStatus,
+            pricing: {
+              adultPrice: {
+                originalPrice: data.pricing.adultPrice.originalPrice,
+                discountPrice: data.pricing.adultPrice.discountPrice || null,
+              },
+              childPrice: {
+                originalPrice: data.pricing.childPrice.originalPrice,
+                discountPrice: data.pricing.childPrice.discountPrice || null,
+              },
+              infantPrice: {
+                originalPrice: data.pricing.infantPrice.originalPrice,
+                discountPrice: data.pricing.infantPrice.discountPrice || null,
+              },
+              singleSupplement: data.pricing.singleSupplement || 0,
+              currency: data.pricing.currency,
+            },
+            tourId: tourId,
+          };
+          const result = await createSchedule(scheduleData);
+          if (result.success) {
+            toast.success("Schedule created successfully");
+            setIsUpdate(null);
+            reset();
+          } else {
+            toast.error(result.message || "Failed to create schedule");
+          }
         }
       } catch (error) {
-        toast.error(
-          "An error occurred while saving the schedule. Please try again.",
-        );
+        toast.error("An error occurred while saving the schedule");
+        return;
       } finally {
         setLoading(false);
       }
     }
   };
-
-  function handleSelectSchedule(index: number) {
-    setIsUpdate(index);
-    if (getTourValues("schedules")[index]) {
-      reset(getTourValues("schedules")[index]);
+  useEffect(() => {
+    if (getValues("id")) {
+      setIsUpdate(Number(getValues("id")));
     }
-  }
-
+  }, [watch("id")]);
   return (
     <div>
       <TabsContent value="schedule">
@@ -580,127 +633,7 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
                   </FieldDescription>
                 )}
                 <div className="p-2 col-span-5 rounded-lg mt-2 overflow-auto max-h-100 max-w-[100%] border border-muted shadow">
-                  <Table>
-                    <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
-                      <TableRow>
-                        <TableHead>departureDate</TableHead>
-                        <TableHead>Total Seats</TableHead>
-                        <TableHead>Surcharge</TableHead>
-                        <TableHead>Adult Price</TableHead>
-                        <TableHead>Child Price</TableHead>
-                        <TableHead>Infant Price</TableHead>
-                        <TableHead>Single Supplement</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getTourValues("schedules")?.length > 0 ? (
-                        getTourValues("schedules").map(
-                          (item: any, index: number) => (
-                            <TableRow
-                              key={index}
-                              onClick={() => handleSelectSchedule(index)}
-                            >
-                              <TableCell>
-                                {formatDate({
-                                  dateString: item.departureDate,
-                                  type: "datetime",
-                                })}
-                              </TableCell>
-                              <TableCell>{item.totalSeats}</TableCell>
-                              <TableCell>{item.surcharge}</TableCell>
-                              <TableCell className="p-0">
-                                <Table>
-                                  <TableHeader className="bg-primary [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
-                                    <TableRow>
-                                      <TableHead>Original</TableHead>
-                                      <TableHead>Discount</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    <TableRow>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.adultPrice
-                                            ?.originalPrice
-                                        }
-                                      </TableCell>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.adultPrice
-                                            ?.discountPrice
-                                        }
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-                              </TableCell>
-                              <TableCell className="p-0">
-                                <Table>
-                                  <TableHeader className="bg-secondary [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
-                                    <TableRow>
-                                      <TableHead>Original</TableHead>
-                                      <TableHead>Discount</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    <TableRow>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.childPrice
-                                            ?.originalPrice
-                                        }
-                                      </TableCell>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.childPrice
-                                            ?.discountPrice
-                                        }
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-                              </TableCell>
-                              <TableCell className="p-0">
-                                <Table>
-                                  <TableHeader className="bg-primary [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
-                                    <TableRow>
-                                      <TableHead>Original</TableHead>
-                                      <TableHead>Discount</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    <TableRow>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.infantPrice
-                                            ?.originalPrice
-                                        }
-                                      </TableCell>
-                                      <TableCell>
-                                        {
-                                          item.pricing?.infantPrice
-                                            ?.discountPrice
-                                        }
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-                              </TableCell>
-                              <TableCell className="p-0 text-center">
-                                {item.pricing?.singleSupplement || 0}
-                              </TableCell>
-                            </TableRow>
-                          ),
-                        )
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center">
-                            No schedule data available
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                  <ScheduleTable tourId={tourId} setValue={setValue} />
                 </div>
               </CardContent>
             </Card>
@@ -711,4 +644,4 @@ const TourScheduleTab = (props: TourScheduleTabProps) => {
   );
 };
 
-export default TourScheduleTab;
+export default TourScheduleUpdateTab;

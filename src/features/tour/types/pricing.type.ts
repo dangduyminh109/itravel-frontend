@@ -8,5 +8,5 @@ export interface Pricing {
 
 export interface TicketPrice {
   originalPrice: number;
-  discountPrice: number;
+  discountPrice?: number | null;
 }

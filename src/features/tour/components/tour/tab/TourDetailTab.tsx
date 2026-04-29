@@ -59,8 +59,8 @@ const TourDescTab = (props: TourDescTabProps) => {
     flatLocations,
   } = props;
   const [services, setServices] = useState({
-    includedServices: getValues("services.includedServices") || [],
-    excludedServices: getValues("services.excludedServices") || [],
+    includes: getValues("services.includes") || [],
+    excludes: getValues("services.excludes") || [],
   });
 
   return (
@@ -68,7 +68,7 @@ const TourDescTab = (props: TourDescTabProps) => {
       <TabsContent value="detail">
         <Card defaultValue="preview">
           <CardHeader className="p-4">
-            <CardTitle>Tour Information</CardTitle>
+            <CardTitle>Tour Detail</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground p-4 pt-0">
             <div className="grid grid-cols-5 gap-3 p-2 rounded-md border-2 border-primary">
@@ -572,21 +572,14 @@ const TourDescTab = (props: TourDescTabProps) => {
                                 type="button"
                                 size="icon"
                                 onClick={() => {
-                                  const serviceInclude = getValues(
-                                    "services.includedServices",
-                                  );
+                                  const serviceInclude =
+                                    getValues("services.includes");
                                   setServices((prev) => ({
                                     ...prev,
-                                    includedServices: [
-                                      ...prev.includedServices,
-                                      "",
-                                    ],
+                                    includes: [...prev.includes, ""],
                                   }));
                                   serviceInclude.push("");
-                                  setValue(
-                                    "services.includedServices",
-                                    serviceInclude,
-                                  );
+                                  setValue("services.includes", serviceInclude);
                                 }}
                               >
                                 <FontAwesomeIcon icon={faPlus} />
@@ -600,21 +593,14 @@ const TourDescTab = (props: TourDescTabProps) => {
                                 type="button"
                                 size="icon"
                                 onClick={() => {
-                                  const serviceExclude = getValues(
-                                    "services.excludedServices",
-                                  );
+                                  const serviceExclude =
+                                    getValues("services.excludes");
                                   setServices((prev) => ({
                                     ...prev,
-                                    excludedServices: [
-                                      ...prev.excludedServices,
-                                      "",
-                                    ],
+                                    excludes: [...prev.excludes, ""],
                                   }));
                                   serviceExclude.push("");
-                                  setValue(
-                                    "services.excludedServices",
-                                    serviceExclude,
-                                  );
+                                  setValue("services.excludes", serviceExclude);
                                 }}
                               >
                                 <FontAwesomeIcon icon={faPlus} />
@@ -626,7 +612,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                       <TableBody>
                         <TableRow>
                           <TableCell className="font-medium align-top">
-                            {services.includedServices.map(
+                            {services.includes.map(
                               (_: string, index: number) => (
                                 <div
                                   className="w-full relative my-4"
@@ -637,21 +623,20 @@ const TourDescTab = (props: TourDescTabProps) => {
                                     key={index}
                                   >
                                     <Textarea
-                                      id={`services.includedServices.${index}`}
+                                      id={`services.includes.${index}`}
                                       placeholder="Enter include service"
                                       className="min-h-[60px]"
                                       {...register(
-                                        `services.includedServices[${index}]`,
+                                        `services.includes[${index}]`,
                                       )}
                                     />
                                   </Field>
-                                  {errors.services?.includedServices?.[index]
+                                  {errors.services?.includes?.[index]
                                     ?.message && (
                                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
                                       {
-                                        errors.services?.includedServices?.[
-                                          index
-                                        ]?.message
+                                        errors.services?.includes?.[index]
+                                          ?.message
                                       }
                                     </FieldDescription>
                                   )}
@@ -663,17 +648,15 @@ const TourDescTab = (props: TourDescTabProps) => {
                                     type="button"
                                     onClick={() =>
                                       setServices((prev) => {
-                                        const newIncludedServices = [
-                                          ...prev.includedServices,
-                                        ];
-                                        newIncludedServices.splice(index, 1);
+                                        const newincludes = [...prev.includes];
+                                        newincludes.splice(index, 1);
                                         setValue(
-                                          "services.includedServices",
-                                          newIncludedServices,
+                                          "services.includes",
+                                          newincludes,
                                         );
                                         return {
                                           ...prev,
-                                          includedServices: newIncludedServices,
+                                          includes: newincludes,
                                         };
                                       })
                                     }
@@ -685,7 +668,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                             )}
                           </TableCell>
                           <TableCell className="font-medium align-top">
-                            {services.excludedServices.map(
+                            {services.excludes.map(
                               (_: string, index: number) => (
                                 <div
                                   className="w-full relative my-4"
@@ -696,21 +679,20 @@ const TourDescTab = (props: TourDescTabProps) => {
                                     key={index}
                                   >
                                     <Textarea
-                                      id={`services.excludedServices.${index}`}
+                                      id={`services.excludes.${index}`}
                                       placeholder="Enter exclude service"
                                       className="min-h-[60px]"
                                       {...register(
-                                        `services.excludedServices[${index}]`,
+                                        `services.excludes[${index}]`,
                                       )}
                                     />
                                   </Field>
-                                  {errors.services?.excludedServices?.[index]
+                                  {errors.services?.excludes?.[index]
                                     ?.message && (
                                     <FieldDescription className="text-red-500 text-xs mt-1 ml-1 max-w-80">
                                       {
-                                        errors.services?.excludedServices?.[
-                                          index
-                                        ]?.message
+                                        errors.services?.excludes?.[index]
+                                          ?.message
                                       }
                                     </FieldDescription>
                                   )}
@@ -722,17 +704,15 @@ const TourDescTab = (props: TourDescTabProps) => {
                                     type="button"
                                     onClick={() =>
                                       setServices((prev) => {
-                                        const newExcludedServices = [
-                                          ...prev.excludedServices,
-                                        ];
-                                        newExcludedServices.splice(index, 1);
+                                        const newexcludes = [...prev.excludes];
+                                        newexcludes.splice(index, 1);
                                         setValue(
-                                          "services.excludedServices",
-                                          newExcludedServices,
+                                          "services.excludes",
+                                          newexcludes,
                                         );
                                         return {
                                           ...prev,
-                                          excludedServices: newExcludedServices,
+                                          excludes: newexcludes,
                                         };
                                       })
                                     }
