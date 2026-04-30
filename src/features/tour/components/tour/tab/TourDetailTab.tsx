@@ -77,7 +77,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                   name="categoryId"
                   control={control}
                   render={({ field }) => (
-                    <Field className="gap-1 w-full">
+                    <Field className="w-full">
                       <FieldLabel htmlFor="categoryId">Category</FieldLabel>
                       <Select
                         onValueChange={(value) => field.onChange(Number(value))}
@@ -120,7 +120,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                     name="departureLocationId"
                     control={control}
                     render={({ field }) => (
-                      <Field className="gap-1 w-full">
+                      <Field className="w-full">
                         <FieldLabel htmlFor="departureLocationId">
                           Departure Location
                         </FieldLabel>
@@ -170,7 +170,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                     name="destinationLocationId"
                     control={control}
                     render={({ field }) => (
-                      <Field className="gap-1 w-full">
+                      <Field className="w-full">
                         <FieldLabel htmlFor="destinationLocationId">
                           Destination Location
                         </FieldLabel>
@@ -217,7 +217,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                 </div>
               </div>
               <div className="col-span-5 flex gap-3 flex-wrap">
-                <Field className="gap-1 flex-1">
+                <Field className="flex-1">
                   <FieldLabel htmlFor="participantLimit.minParticipants">
                     Min Participants
                   </FieldLabel>
@@ -237,7 +237,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                     </FieldDescription>
                   )}
                 </Field>
-                <Field className="gap-1 flex-1">
+                <Field className="flex-1">
                   <FieldLabel htmlFor="participantLimit.maxParticipants">
                     Max Participants
                   </FieldLabel>
@@ -291,7 +291,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                       <TableHeader className="bg-foreground [&_tr:hover]:bg-foreground [&_th]:!text-background [&_th]:!whitespace-nowrap">
                         <TableRow>
                           <TableHead>Type</TableHead>
-                          <TableHead>Orginal Price</TableHead>
+                          <TableHead>Original Price</TableHead>
                           <TableHead>Discount Price</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -299,7 +299,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                         <TableRow>
                           <TableCell className="font-medium">Adult</TableCell>
                           <TableCell>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.adultPrice.originalPrice"
@@ -332,7 +332,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                             </Field>
                           </TableCell>
                           <TableCell>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.adultPrice.discountPrice"
@@ -373,7 +373,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                         <TableRow>
                           <TableCell className="font-medium">Child</TableCell>
                           <TableCell>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.childPrice.originalPrice"
@@ -406,7 +406,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                             </Field>
                           </TableCell>
                           <TableCell>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.childPrice.discountPrice"
@@ -447,7 +447,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                         <TableRow>
                           <TableCell className="font-medium">Infant</TableCell>
                           <TableCell>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.infantPrice.originalPrice"
@@ -480,7 +480,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                             </Field>
                           </TableCell>
                           <TableCell>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.infantPrice.discountPrice"
@@ -523,7 +523,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                             Single Supplement
                           </TableCell>
                           <TableCell colSpan={2}>
-                            <Field className="gap-1 col-span-4">
+                            <Field className="col-span-4">
                               <InputGroup>
                                 <InputGroupInput
                                   id="pricing.singleSupplement"
@@ -619,7 +619,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   key={index}
                                 >
                                   <Field
-                                    className="gap-1 col-span-5 relative mb-2"
+                                    className="col-span-5 relative mb-2"
                                     key={index}
                                   >
                                     <Textarea
@@ -675,7 +675,7 @@ const TourDescTab = (props: TourDescTabProps) => {
                                   key={index}
                                 >
                                   <Field
-                                    className="gap-1 col-span-5 relative mb-2"
+                                    className="col-span-5 relative mb-2"
                                     key={index}
                                   >
                                     <Textarea

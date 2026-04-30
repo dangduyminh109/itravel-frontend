@@ -41,6 +41,15 @@ export async function getTour(id: string): Promise<ApiResponse<TourFullInfo>> {
   return result;
 }
 
+export async function getTourDetail(
+  idOrSlug: string,
+): Promise<ApiResponse<TourDetail>> {
+  const result = await apiClient<TourDetail>(`/tour/${idOrSlug}/detail`, {
+    method: "GET",
+  });
+  return result;
+}
+
 export async function createTour(
   tourData: CreateTourData,
 ): Promise<ApiResponse<TourDetail>> {

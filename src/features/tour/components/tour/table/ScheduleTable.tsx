@@ -6,9 +6,11 @@ import { columns } from "./ScheduleColumn";
 const ScheduleTable = ({
   tourId,
   setValue,
+  isView = false,
 }: {
   tourId: string;
   setValue: any;
+  isView: boolean;
 }) => {
   const getSchedulesWithTourId = async ({
     page,
@@ -30,6 +32,7 @@ const ScheduleTable = ({
         columns={columns}
         getData={getSchedulesWithTourId}
         setValue={setValue}
+        isView={isView}
       />
     </div>
   );

@@ -30,11 +30,13 @@ interface ScheduleDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   setValue: any;
   getData: (args: any) => Promise<ApiResponse<PagingResponse<TData[]>>>;
+  isView?: boolean;
 }
 export function ScheduleDataTable<TData, TValue>({
   columns,
   getData,
   setValue,
+  isView,
 }: ScheduleDataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -86,7 +88,7 @@ export function ScheduleDataTable<TData, TValue>({
 
   const handleSelectedRow = (rowId: string) => {
     const selectedRow = table.getRow(rowId).original as any;
-    if (selectedRow) {
+    if (selectedRow && !isView) {
       setValue("id", selectedRow.id);
       setValue("departureDate", selectedRow.departureDate);
       setValue("totalSeats", selectedRow.totalSeats);
@@ -121,6 +123,8 @@ export function ScheduleDataTable<TData, TValue>({
         selectedRow.pricing?.singleSupplement || 0,
       );
       setValue("pricing.currency", selectedRow.pricing?.currency || "VND");
+    } else if (isView && selectedRow) {
+      setValue(selectedRow);
     }
   };
 

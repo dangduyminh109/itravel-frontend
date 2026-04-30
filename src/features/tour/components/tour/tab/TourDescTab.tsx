@@ -40,7 +40,7 @@ const TourDescTab = (props: TourDescTabProps) => {
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground p-4 pt-0">
             <div className="grid grid-cols-5 gap-3 p-2 rounded-md border-2 border-primary">
-              <Field className="gap-1 col-span-4">
+              <Field className="col-span-4">
                 <FieldLabel htmlFor="name">Tour Name</FieldLabel>
                 <InputGroup>
                   <InputGroupInput

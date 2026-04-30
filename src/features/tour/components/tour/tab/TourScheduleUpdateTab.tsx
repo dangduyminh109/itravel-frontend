@@ -229,7 +229,6 @@ const TourScheduleUpdateTab = (props: TourScheduleTabProps) => {
                   name="departureDate"
                   render={({ field }) => {
                     const [datePart, timePart] = (field.value || "").split("T");
-
                     const selectedDate = datePart
                       ? new Date(datePart + "T00:00:00")
                       : undefined;
@@ -633,7 +632,11 @@ const TourScheduleUpdateTab = (props: TourScheduleTabProps) => {
                   </FieldDescription>
                 )}
                 <div className="p-2 col-span-5 rounded-lg mt-2 overflow-auto max-h-100 max-w-[100%] border border-muted shadow">
-                  <ScheduleTable tourId={tourId} setValue={setValue} />
+                  <ScheduleTable
+                    tourId={tourId}
+                    setValue={setValue}
+                    isView={false}
+                  />
                 </div>
               </CardContent>
             </Card>
